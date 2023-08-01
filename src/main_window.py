@@ -1,7 +1,7 @@
-from PyQt6 import uic
+from PyQt6 import QtGui, uic
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QTreeView
-from PyQt6.QtSql import QSqlRelationalTableModel
+from PyQt6.QtSql import QSqlTableModel
 
 
 from src.inventory_handler import InventoryHandler
@@ -24,13 +24,9 @@ class MainWindow(QMainWindow):
 
     
     def _set_up_table_model(self):
-        model = QSqlRelationalTableModel(self)
+        model = QSqlTableModel(self)
         model.setTable("beads")
-        model.setEditStrategy(QSqlRelationalTableModel.EditStrategy.OnFieldChange)
-        model.setHeaderData(0, Qt.Orientation.Horizontal, "shape")
-        model.setHeaderData(1, Qt.Orientation.Horizontal, "type")
-        model.setHeaderData(2, Qt.Orientation.Horizontal, "color")
-        model.setHeaderData(3, Qt.Orientation.Horizontal, "finishing_effect")
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnRowChange)
         model.select()
         
         return model
@@ -45,3 +41,19 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(view)
         return view
 
+
+    def edit_on_double_click(self, model_index):
+        print(f"modelIndex.row(): {model_index.row()}")
+
+
+    def delete_selected_row(self, model_index):
+        print("delete")
+
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Delete:
+            if self.ui.tableView.selectedIndexes():
+                index = self.ui.tableView.selectedIndexes()[0]
+                print(self.table_model.removeRow(index.row()))
+                self.table_model.submitAll()
+                self.table_model.select()
