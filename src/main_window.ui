@@ -63,7 +63,7 @@
        <string notr="true">*{
 border: 2px solid '#000800';
 border-radius: 10px;
-background: '#55A9E8';
+background: '#0e7190';
 font-size: 10px;
 color: 'white';
 }
@@ -92,6 +92,10 @@ border-radius: 10px;
 background: '#0e7190';
 font-size: 10px;
 color: 'white';
+}
+*:hover{
+background: 'white';
+color: 'black'
 }</string>
       </property>
       <property name="text">
@@ -127,6 +131,10 @@ border-radius: 10px;
 background: '#0e7190';
 font-size: 10px;
 color: 'white';
+}
+*:hover{
+background: 'white';
+color: 'black'
 }</string>
       </property>
       <property name="text">
@@ -217,9 +225,43 @@ color: 'white';
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>released()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>manualAddItem()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>174</x>
+     <y>-6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>released()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadFromFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>37</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>115</x>
+     <y>-14</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>edit_on_double_click(QModelIndex)</slot>
   <slot>delete_selected_row(QModelIndex)</slot>
+  <slot>manualAddItem()</slot>
+  <slot>loadFromFile()</slot>
  </slots>
 </ui>

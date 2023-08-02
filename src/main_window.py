@@ -1,6 +1,6 @@
-from PyQt6 import QtGui, uic
+from PyQt6 import uic
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow, QTreeView
+from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox
 from PyQt6.QtSql import QSqlTableModel
 
 
@@ -52,8 +52,24 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Icon.Question)
+            msg.setText("Usunąć element?")
+            msg.setInformativeText("Ta operacja usunie element z bazy danych na stałe. Czy kontunuowac?")
+            msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
+            msg.exec()
+            
+            
+
             if self.ui.tableView.selectedIndexes():
                 index = self.ui.tableView.selectedIndexes()[0]
-                print(self.table_model.removeRow(index.row()))
+                self.table_model.removeRow(index.row())
                 self.table_model.submitAll()
                 self.table_model.select()
+
+    def manualAddItem(self):
+        print("Manual add placeholder")
+        self.table_model.select()
+
+    def loadFromFile(self):
+        print("Load from file placeholder")
