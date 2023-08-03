@@ -21,11 +21,10 @@ class MainWindow(QMainWindow):
         # self.ui.treeView.setModel(self.model)
         self.show()
         # self.view = self._set_up_view()
-
     
     def _set_up_table_model(self):
         model = QSqlTableModel(self)
-        model.setTable("beads")
+        model.setTable("items")
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnRowChange)
         model.select()
         
@@ -41,14 +40,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(view)
         return view
 
-
     def edit_on_double_click(self, model_index):
         print(f"modelIndex.row(): {model_index.row()}")
 
-
     def delete_selected_row(self, model_index):
         print("delete")
-
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
@@ -58,8 +54,6 @@ class MainWindow(QMainWindow):
             msg.setInformativeText("Ta operacja usunie element z bazy danych na stałe. Czy kontunuowac?")
             msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
             msg.exec()
-            
-            
 
             if self.ui.tableView.selectedIndexes():
                 index = self.ui.tableView.selectedIndexes()[0]
