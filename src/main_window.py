@@ -1,6 +1,6 @@
 from PyQt6 import uic
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu
 from PyQt6.QtSql import QSqlTableModel
 
 

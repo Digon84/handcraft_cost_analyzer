@@ -10,6 +10,9 @@
     <height>792</height>
    </rect>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>Handcraft cost analyzer</string>
   </property>
@@ -153,11 +156,14 @@ color: 'black'
       <property name="mouseTracking">
        <bool>false</bool>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustToContents</enum>
       </property>
       <property name="editTriggers">
-       <set>QAbstractItemView::DoubleClicked</set>
+       <set>QAbstractItemView::NoEditTriggers</set>
       </property>
       <property name="alternatingRowColors">
        <bool>true</bool>
@@ -263,5 +269,6 @@ color: 'black'
   <slot>delete_selected_row(QModelIndex)</slot>
   <slot>manualAddItem()</slot>
   <slot>loadFromFile()</slot>
+  <slot>customContextMenuRequestedTableView()</slot>
  </slots>
 </ui>
