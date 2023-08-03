@@ -1,4 +1,5 @@
 from src.database_connector import DataBaseConnector
+from PyQt6.QtSql import QSqlQuery
 
 
 class InventoryHandlerMeta(type):
@@ -19,6 +20,11 @@ class InventoryHandler(metaclass=InventoryHandlerMeta):
         )
         self.connector.open_connection()
 
-    def add_bead(self, amount):
-        sql_query = f"INSERT INTO beads (shape, type, color, finishing_effect, size, amount, price) VALUES ('test', 'test_type', 'test_color', 'test_finishing_effect', 0.8, {amount}, 14.2)"
-        self.connector.execute_query(sql_query)
+    def populate_with_test_data(self):
+        for i in range(100):
+            self.connector.execute_query(
+                f'INSERT INTO items'
+                f'(material, type, shape, color, finishing_effect, size, amount, other, unit_price, total_price)'
+                f'VALUES ("{"test_matherial_" + str(i)}", "{"test_type_" + str(i)}", "{"test_shape_" + str(i)}",'
+                f'"{"test_color_" + str(i)}", "{"test_size_" + str(i)}", {i}, {i}, {i}, {i}, {i})'
+            )

@@ -16,6 +16,4 @@ window = QMainWindow()
 window.show()
 
 db_connector = InventoryHandler(database_connector=SqliteConnector)
-db_connector.add_bead(100)
-db_connector.add_bead(150)
 app.exec()
