@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1291</width>
-    <height>770</height>
+    <width>1334</width>
+    <height>777</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,7 +75,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1291</width>
+     <width>1334</width>
      <height>22</height>
     </rect>
    </property>
@@ -84,22 +84,6 @@
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>inventory_add_from_file</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>inventory_add_from_file_clicker()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>91</x>
-     <y>81</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>396</x>
-     <y>-14</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>inventory_add_manually</sender>
    <signal>clicked()</signal>
@@ -136,7 +120,7 @@
    <sender>inventory_line_edit</sender>
    <signal>returnPressed()</signal>
    <receiver>MainWindow</receiver>
-   <slot>inventory_search()</slot>
+   <slot>inventory_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>434</x>
@@ -149,26 +133,42 @@
    </hints>
   </connection>
   <connection>
+   <sender>inventory_add_from_file</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>inventory_add_from_file_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>109</x>
+     <y>-7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>inventory_search</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
-   <slot>inventory_search()</slot>
+   <slot>inventory_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1226</x>
-     <y>84</y>
+     <x>1248</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1196</x>
-     <y>-2</y>
+     <x>1217</x>
+     <y>-16</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
-  <slot>inventory_add_from_file()</slot>
+  <slot>inventory_add_from_file_clicked()</slot>
   <slot>inventory_add_manually()</slot>
-  <slot>inventory_search()</slot>
+  <slot>inventory_search_clicked()</slot>
   <slot>inventory_edit_item()</slot>
  </slots>
 </ui>

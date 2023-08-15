@@ -23,8 +23,8 @@ class InventoryHandler(metaclass=InventoryHandlerMeta):
     def populate_with_test_data(self):
         for i in range(100):
             self.connector.execute_query(
-                f'INSERT INTO items'
-                f'(material, type, shape, color, finishing_effect, size, amount, other, unit_price, total_price)'
+                f"INSERT INTO items"
+                f"(material, type, shape, color, finishing_effect, size, amount, other, unit_price, total_price)"
                 f'VALUES ("{"test_matherial_" + str(i)}", "{"test_type_" + str(i)}", "{"test_shape_" + str(i)}",'
                 f'"{"test_color_" + str(i)}", "{"test_size_" + str(i)}", {i}, {i}, {i}, {i}, {i})'
             )
