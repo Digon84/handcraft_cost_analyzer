@@ -148,6 +148,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>inventory_search</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>inventory_search()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1226</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1196</x>
+     <y>-2</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>inventory_add_from_file()</slot>
