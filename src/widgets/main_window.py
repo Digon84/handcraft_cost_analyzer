@@ -6,6 +6,7 @@ from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
 from src.inventory_handler import InventoryHandler
 from src.sqlite_connector import SqliteConnector
+from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.edit_inventory_item_widget import InventoryEditItem
 from src.widgets.add_from_file_inventory_widget import AddFromFileInventoryWidget
 
@@ -44,6 +45,7 @@ class MainWindow(QMainWindow):
 
     def inventory_add_manually_clicked(self):
         print("inventory_add_manually_clicked")
+        add_new_item = AddNewItemManuallyWidget(self.table_model)
         
 
     def inventory_edit_item(self, model_index):

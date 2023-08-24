@@ -57,7 +57,11 @@
          </widget>
         </item>
         <item row="1" column="3" colspan="2">
-         <widget class="QTableView" name="inventory_table_view"/>
+         <widget class="QTableView" name="inventory_table_view">
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
