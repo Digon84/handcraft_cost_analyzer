@@ -1,7 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu
-from PyQt6.QtSql import QSqlTableModel
+from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
 
 from src.inventory_handler import InventoryHandler
@@ -21,9 +21,9 @@ class MainWindow(QMainWindow):
         self.show()
 
     def _set_up_table_model(self):
-        model = QSqlTableModel(self)
+        model = QSqlRelationalTableModel(self)
         model.setTable("items")
-        model.setEditStrategy(QSqlTableModel.EditStrategy.OnRowChange)
+        model.setEditStrategy(QSqlRelationalTableModel.EditStrategy.OnRowChange)
         model.select()
 
         return model
@@ -44,12 +44,11 @@ class MainWindow(QMainWindow):
 
     def inventory_add_manually_clicked(self):
         print("inventory_add_manually_clicked")
-        inventory_edit = InventoryEditItem()
         
 
     def inventory_edit_item(self, model_index):
         print("inventory_table_view")
-        inventory_edit = InventoryEditItem()
+        inventory_edit = InventoryEditItem(self.table_model, model_index)
         
 
     def inventory_search_clicked(self):
