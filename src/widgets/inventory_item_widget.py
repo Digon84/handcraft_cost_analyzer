@@ -1,9 +1,10 @@
 from PyQt6.QtCore import Qt
+from PyQt6.QtSql import QSqlRelationalTableModel
 from PyQt6.QtWidgets import QDialogButtonBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, QDialog
 
 
 class InventoryItemWidget(QDialog):
-    def __init__(self, table_model):
+    def __init__(self, table_model: QSqlRelationalTableModel):
         super().__init__()
         self.table_model = table_model
         self.setWindowTitle("Update item")
@@ -22,6 +23,7 @@ class InventoryItemWidget(QDialog):
 
             label = QLabel(column_name)
             line_edit = QLineEdit()
+            line_edit.setObjectName(column_name)
             line_edit.setProperty("name", column_name)
 
             grid_layout.addWidget(label, i, 0)
