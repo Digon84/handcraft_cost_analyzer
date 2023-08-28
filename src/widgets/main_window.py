@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
 
     def inventory_add_from_file_clicked(self):
         print("inventory_add_from_file_clicked")
-        inventory_add_from_file = AddFromFileInventoryWidget()
+        inventory_add_from_file = AddFromFileInventoryWidget(self.table_model)
 
     def inventory_add_manually_clicked(self):
         print("inventory_add_manually_clicked")
