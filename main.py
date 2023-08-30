@@ -1,19 +1,9 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow
-
 import sys
-
-from src.inventory_handler import InventoryHandler
-from src.sqlite_connector import SqliteConnector
+from src.widgets.main_window import MainWindow
 
 app = QApplication(sys.argv)
 
+window = MainWindow()
 
-app.setApplicationName("Handcraft cost analyzer")
-app.setApplicationDisplayName("Handcraft cost analyzer")
-
-
-window = QMainWindow()
-window.show()
-
-db_connector = InventoryHandler(database_connector=SqliteConnector)
 app.exec()
