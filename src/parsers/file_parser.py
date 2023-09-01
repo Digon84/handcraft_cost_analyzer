@@ -11,7 +11,8 @@ class ParsedItem:
 
 
 class FileParser:
-    def __init__(self, file_handle, values_to_search_for, section_identifier):
+    # TODO: get rid of values_to_search_for and section_identifier??
+    def __init__(self, file_handle, values_to_search_for=[], section_identifier=""):
         self.file_handle = file_handle
         self.values_to_search_for = values_to_search_for
         self.section_identifier = section_identifier
