@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1001</width>
+    <width>1053</width>
     <height>671</height>
    </rect>
   </property>
@@ -86,7 +86,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>928</x>
-     <y>-3</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -106,10 +106,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tableWidget</sender>
+   <signal>cellChanged(int,int)</signal>
+   <receiver>Dialog</receiver>
+   <slot>cell_content_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>189</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>417</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>load_from_file_load_pressed()</slot>
   <slot>load_from_file_table_edit()</slot>
   <slot>load_from_file_text_window_clicked()</slot>
+  <slot>cell_content_changed()</slot>
  </slots>
 </ui>
