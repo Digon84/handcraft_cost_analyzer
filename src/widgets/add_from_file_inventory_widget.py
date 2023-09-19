@@ -73,9 +73,10 @@ class AddFromFileInventoryWidget(QDialog):
             for i in range(row_count):
                 record = self.table_model.record()
                 for j in range(column_count):
+                    # TODO: to make it work I needed to change add_date to NOT NULL, in other cases 2 rows were added -
+                    #  one with date and one without. Check how it can be handled in the code
                     record.setValue(table_widget.horizontalHeaderItem(j).text(), table_widget.item(i, j).text())
                     self.table_model.insertRecord(-1, record)
-            self.table_model.submitAll()
             self.table_model.select()
         super().accept()
 

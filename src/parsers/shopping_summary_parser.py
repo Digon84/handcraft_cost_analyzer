@@ -1,3 +1,4 @@
+import datetime
 import json
 import re
 from csv import DictReader
@@ -23,10 +24,13 @@ class ShoppingSummaryParser:
                 dict_reader = DictReader(f, delimiter=";")
                 for row in dict_reader:
                     for key, value in row.items():
-                        if key != "made_off":
-                            part_item.append(ParsedItem(column_name=key,
-                                                        value=value,
-                                                        parsed_ok=True))
+                        part_item.append(ParsedItem(column_name=key,
+                                                    value=value,
+                                                    parsed_ok=True))
+                    # Add current date
+                    part_item.append(ParsedItem(column_name="add_date",
+                                                value=str(datetime.date.today()),
+                                                parsed_ok=True))
                     parsed_items.append(part_item)
                     part_item = []
                 if parsed_items:
