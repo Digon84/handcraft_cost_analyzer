@@ -1,3 +1,5 @@
+import datetime
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlRelationalTableModel
 from PyQt6.QtWidgets import QDialogButtonBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, QDialog
@@ -25,6 +27,9 @@ class InventoryItemWidget(QDialog):
             line_edit = QLineEdit()
             line_edit.setObjectName(column_name)
             line_edit.setProperty("name", column_name)
+
+            if column_name == "add_date":
+                line_edit.setText(str(datetime.date.today()))
 
             grid_layout.addWidget(label, i, 0)
             grid_layout.addWidget(line_edit, i, 1)
