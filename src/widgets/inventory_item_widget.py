@@ -1,6 +1,6 @@
 import datetime
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSortFilterProxyModel
 from PyQt6.QtSql import QSqlRelationalTableModel
 from PyQt6.QtWidgets import QDialogButtonBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, QDialog
 
