@@ -1,5 +1,5 @@
 from PyQt6 import uic
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex
 from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu
 from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
@@ -17,8 +17,11 @@ class MainWindow(QMainWindow):
         self.ui = uic.loadUi("src/ui/main_window.ui", self)
         self.show()
         self.db_connector = InventoryHandler(database_connector=SqliteConnector)
-        self.table_model = self._set_up_table_model()
-        self.ui.inventory_table_view.setModel(self.table_model)
+        self.source_table_model = self._set_up_table_model()
+        self.proxy_model = InventoryFilterProxyModel()
+        self.proxy_model.setSourceModel(self.source_table_model)
+
+        self.ui.inventory_table_view.setModel(self.proxy_model)
         self.show()
 
     def _set_up_table_model(self):
@@ -29,32 +32,24 @@ class MainWindow(QMainWindow):
 
         return model
 
-    def _set_up_tree_model(self):
-        pass
-
-    def _set_up_view(self):
-        view = QTreeView()
-        view.setModel(self.model)
-        self.setCentralWidget(view)
-
-        return view
-
     def inventory_add_from_file_clicked(self):
         print("inventory_add_from_file_clicked")
-        inventory_add_from_file = AddFromFileInventoryWidget(self.table_model)
+        inventory_add_from_file = AddFromFileInventoryWidget(self.source_table_model)
 
     def inventory_add_manually_clicked(self):
         print("inventory_add_manually_clicked")
-        add_new_item = AddNewItemManuallyWidget(self.table_model)
-        
+        add_new_item = AddNewItemManuallyWidget(self.source_table_model)
 
     def inventory_edit_item(self, model_index):
         print("inventory_table_view")
-        inventory_edit = InventoryEditItem(self.table_model, model_index)
-        
+        # TODO: check if this is needed. Can we have one index?
+        source_index = self.proxy_model.mapToSource(model_index)
+        inventory_edit = InventoryEditItem(self.source_table_model, source_index)
 
     def inventory_search_clicked(self):
         print("inventory_search")
+        self.proxy_model.filter = self.ui.inventory_line_edit.text()
+        self.proxy_model.invalidateFilter()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
@@ -70,6 +65,24 @@ class MainWindow(QMainWindow):
                 )
                 msg.exec()
                 index = self.ui.inventory_table_view.selectedIndexes()[0]
-                self.table_model.removeRow(index.row())
-                self.table_model.submitAll()
-                self.table_model.select()
+                self.source_table_model.removeRow(index.row())
+                self.source_table_model.submitAll()
+                self.source_table_model.select()
+
+
+class InventoryFilterProxyModel(QSortFilterProxyModel):
+    def __init__(self):
+        super().__init__()
+        self.filter = ""
+
+    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
+        if self.filter != "":
+            for column in range(self.sourceModel().columnCount()):
+                first_column_index = self.sourceModel().index(source_row, column, source_parent)
+                if self.filter in str(self.sourceModel().data(first_column_index)):
+                    return True
+                else:
+                    continue
+        else:
+            return True
+        return False
