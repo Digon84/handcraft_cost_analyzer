@@ -65,9 +65,9 @@ class MainWindow(QMainWindow):
                 )
                 msg.exec()
                 index = self.ui.inventory_table_view.selectedIndexes()[0]
-                self.proxy_model.removeRow(index.row())
-                self.proxy_model.submitAll()
-                self.proxy_model.select()
+                self.source_table_model.removeRow(index.row())
+                self.source_table_model.submitAll()
+                self.source_table_model.select()
 
 
 class InventoryFilterProxyModel(QSortFilterProxyModel):
