@@ -5,6 +5,8 @@ from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
 
 from src.inventory_handler import InventoryHandler
+from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
+from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 from src.sqlite_connector import SqliteConnector
 from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.edit_inventory_item_widget import InventoryEditItem
@@ -22,14 +24,14 @@ class MainWindow(QMainWindow):
         self.proxy_model.setSourceModel(self.source_table_model)
 
         self.completer_proxy_model = UniqueItemsProxyModel()
+        one_column_table_proxy_model = OneColumnTableProxyModel()
+        one_column_table_proxy_model.setSourceModel(self.source_table_model)
 
-        self.completer_proxy_model.setSourceModel(self.source_table_model)
-        self.completer_proxy_model.setFilterKeyColumn(1)
-        self.completer_proxy_model.set_desired_column(1)
+        self.completer_proxy_model.setSourceModel(one_column_table_proxy_model)
+
 
         completer = QCompleter(self.completer_proxy_model)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        completer.setCompletionColumn(1)
         self.ui.inventory_line_edit.setCompleter(completer)
         self.ui.inventory_table_view.setModel(self.proxy_model)
         self.show()
@@ -94,23 +96,6 @@ class InventoryFilterProxyModel(QSortFilterProxyModel):
                 else:
                     continue
         else:
-            return True
-        return False
-
-
-class UniqueItemsProxyModel(QSortFilterProxyModel):
-    def __init__(self):
-        super().__init__()
-        self.column = None
-        self.unique_items = []
-
-    def set_desired_column(self, column):
-        self.column = column
-
-    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
-        first_column_index = self.sourceModel().index(source_row, self.column, source_parent)
-        if str(self.sourceModel().data(first_column_index)) not in self.unique_items:
-            self.unique_items.append(str(self.sourceModel().data(first_column_index)))
             return True
         return False
 
