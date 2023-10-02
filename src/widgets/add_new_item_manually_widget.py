@@ -1,5 +1,4 @@
 from PyQt6.QtSql import QSqlRelationalTableModel
-from PyQt6.QtWidgets import QLineEdit
 
 from .inventory_item_widget import InventoryItemWidget
 
