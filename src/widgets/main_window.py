@@ -18,23 +18,24 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = uic.loadUi("src/ui/main_window.ui", self)
-        self.show()
+        # self.show()
         self.db_connector = InventoryHandler(database_connector=SqliteConnector)
         self.source_table_model = self._set_up_table_model()
+        self.ui.inventory_line_edit.setCompleter(self._set_up_completer())
         self.proxy_model = InventoryFilterProxyModel()
         self.proxy_model.setSourceModel(self.source_table_model)
-
-        self.completer_proxy_model = UniqueItemsProxyModel()
-        one_column_table_proxy_model = OneColumnTableProxyModel()
-        one_column_table_proxy_model.setSourceModel(self.source_table_model)
-
-        self.completer_proxy_model.setSourceModel(one_column_table_proxy_model)
-
-        completer = QCompleter(self.completer_proxy_model)
-        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        self.ui.inventory_line_edit.setCompleter(completer)
         self.ui.inventory_table_view.setModel(self.proxy_model)
         self.show()
+
+    def _set_up_completer(self):
+        completer_proxy_model = UniqueItemsProxyModel(self)
+        one_column_table_proxy_model = OneColumnTableProxyModel()
+        one_column_table_proxy_model.setSourceModel(self.source_table_model)
+        completer_proxy_model.setSourceModel(one_column_table_proxy_model)
+        completer = QCompleter(completer_proxy_model)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+
+        return completer
 
     def _set_up_table_model(self):
         model = QSqlRelationalTableModel(self)

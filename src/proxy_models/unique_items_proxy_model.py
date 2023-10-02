@@ -2,8 +2,8 @@ from PyQt6.QtCore import QSortFilterProxyModel, QModelIndex
 
 
 class UniqueItemsProxyModel(QSortFilterProxyModel):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.column = None
         self.unique_items = []
 
