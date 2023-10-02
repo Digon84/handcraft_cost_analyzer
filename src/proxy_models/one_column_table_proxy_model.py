@@ -40,20 +40,7 @@ class OneColumnTableProxyModel(QAbstractProxyModel):
 
     def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...) -> typing.Any:
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
-            print("Display role")
             return "One column proxy"
         elif orientation == Qt.Orientation.Vertical and role == Qt.ItemDataRole.DisplayRole:
             return section
         return super().headerData(section, orientation, role)
-
-
-
-
-
-    # def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
-    #     print(f"column: {source_parent.column()}")
-    #     first_column_index = self.sourceModel().index(source_row, self.column, source_parent)
-    #     if str(self.sourceModel().data(first_column_index)) not in self.unique_items:
-    #         self.unique_items.append(str(self.sourceModel().data(first_column_index)))
-    #         return True
-    #     return False

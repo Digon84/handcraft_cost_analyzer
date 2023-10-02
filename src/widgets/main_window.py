@@ -5,6 +5,7 @@ from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
 
 from src.inventory_handler import InventoryHandler
+from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
 from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 from src.sqlite_connector import SqliteConnector
@@ -28,7 +29,6 @@ class MainWindow(QMainWindow):
         one_column_table_proxy_model.setSourceModel(self.source_table_model)
 
         self.completer_proxy_model.setSourceModel(one_column_table_proxy_model)
-
 
         completer = QCompleter(self.completer_proxy_model)
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
@@ -80,22 +80,3 @@ class MainWindow(QMainWindow):
                 self.source_table_model.removeRow(index.row())
                 self.source_table_model.submitAll()
                 self.source_table_model.select()
-
-
-class InventoryFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self):
-        super().__init__()
-        self.filter = ""
-
-    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
-        if self.filter != "":
-            for column in range(self.sourceModel().columnCount()):
-                first_column_index = self.sourceModel().index(source_row, column, source_parent)
-                if self.filter in str(self.sourceModel().data(first_column_index)):
-                    return True
-                else:
-                    continue
-        else:
-            return True
-        return False
-
