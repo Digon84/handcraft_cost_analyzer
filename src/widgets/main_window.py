@@ -1,10 +1,13 @@
 from PyQt6 import uic
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex
-from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu
+from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu, QCompleter
 from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
 
 from src.inventory_handler import InventoryHandler
+from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
+from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
+from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 from src.sqlite_connector import SqliteConnector
 from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.edit_inventory_item_widget import InventoryEditItem
@@ -15,14 +18,24 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = uic.loadUi("src/ui/main_window.ui", self)
-        self.show()
+        # self.show()
         self.db_connector = InventoryHandler(database_connector=SqliteConnector)
         self.source_table_model = self._set_up_table_model()
+        self.ui.inventory_line_edit.setCompleter(self._set_up_completer())
         self.proxy_model = InventoryFilterProxyModel()
         self.proxy_model.setSourceModel(self.source_table_model)
-
         self.ui.inventory_table_view.setModel(self.proxy_model)
         self.show()
+
+    def _set_up_completer(self):
+        completer_proxy_model = UniqueItemsProxyModel(self)
+        one_column_table_proxy_model = OneColumnTableProxyModel()
+        one_column_table_proxy_model.setSourceModel(self.source_table_model)
+        completer_proxy_model.setSourceModel(one_column_table_proxy_model)
+        completer = QCompleter(completer_proxy_model)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+
+        return completer
 
     def _set_up_table_model(self):
         model = QSqlRelationalTableModel(self)
@@ -68,21 +81,3 @@ class MainWindow(QMainWindow):
                 self.source_table_model.removeRow(index.row())
                 self.source_table_model.submitAll()
                 self.source_table_model.select()
-
-
-class InventoryFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self):
-        super().__init__()
-        self.filter = ""
-
-    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
-        if self.filter != "":
-            for column in range(self.sourceModel().columnCount()):
-                first_column_index = self.sourceModel().index(source_row, column, source_parent)
-                if self.filter in str(self.sourceModel().data(first_column_index)):
-                    return True
-                else:
-                    continue
-        else:
-            return True
-        return False
