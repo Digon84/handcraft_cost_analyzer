@@ -1,4 +1,4 @@
-from src.database_connector import DataBaseConnector
+from src.database.database_connector import DataBaseConnector
 
 
 class SqliteConnector(DataBaseConnector):

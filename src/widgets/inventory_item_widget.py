@@ -1,14 +1,15 @@
 import datetime
 
 from PyQt6.QtCore import Qt, QSortFilterProxyModel
-from PyQt6.QtSql import QSqlRelationalTableModel
+from PyQt6.QtSql import QSqlRelationalTableModel, QSqlQueryModel
 from PyQt6.QtWidgets import QDialogButtonBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, QDialog, QCompleter
 
+from src.database.table_layouts import INVENTORY_TABLE_LAYOUT
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 
 
 class InventoryItemWidget(QDialog):
-    def __init__(self, table_model: QSqlRelationalTableModel):
+    def __init__(self, table_model: QSqlQueryModel):
         super().__init__()
         self.table_model = table_model
         self.setWindowTitle("Update item")
@@ -22,18 +23,22 @@ class InventoryItemWidget(QDialog):
 
         grid_layout = QGridLayout()
 
-        for i in range(self.table_model.columnCount()):
+        for i, column in enumerate(INVENTORY_TABLE_LAYOUT):
             column_name = self.table_model.headerData(i, Qt.Orientation.Horizontal)
-
-            label = QLabel(column_name)
+            # Don't drow for component_id. It is only used in queries.
+            if column_name == "component_id":
+                continue
+            label = QLabel(column.column_name + ("*" if column.is_mandatory else ""))
             line_edit = QLineEdit()
-            line_edit.setObjectName(column_name)
-            line_edit.setProperty("name", column_name)
+            line_edit.setObjectName(column.column_name)
+            line_edit.setProperty("name", column.column_name)
             line_edit.setCompleter(self.get_completer(i))
 
-            if column_name == "add_date":
+            if column.column_name == "add_date":
                 line_edit.setText(str(datetime.date.today()))
 
+            if column.is_disabled:
+                line_edit.setDisabled(True)
             grid_layout.addWidget(label, i, 0)
             grid_layout.addWidget(line_edit, i, 1)
 

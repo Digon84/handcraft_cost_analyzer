@@ -10,10 +10,9 @@ from src.parsers.shopping_summary_parser import ShoppingSummaryParser
 from src.parsers.file_parser import ParsedItem
 
 
-# TODO: make connection to main window - right now when main window is closed this window remains
 class AddFromFileInventoryWidget(QDialog):
-    def __init__(self, table_model: QSqlRelationalTableModel):
-        super(QDialog, self).__init__()
+    def __init__(self, parent, table_model: QSqlRelationalTableModel):
+        super(QDialog, self).__init__(parent=parent)
         self.table_model = table_model
         self.first_table_fill = True
         self.ui = uic.loadUi("src/ui/load_from_file_widget.ui", self)

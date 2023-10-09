@@ -1,13 +1,13 @@
 from PyQt6 import uic
-from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex
-from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu, QCompleter
-from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel, QSqlRelation, QSqlQueryModel
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter
+from PyQt6.QtSql import QSqlQueryModel
 
-from src.inventory_handler import InventoryHandler
+from src.database.inventory_handler import InventoryHandler
 from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
 from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
-from src.sqlite_connector import SqliteConnector
+from src.database.sqlite_connector import SqliteConnector
 from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.edit_inventory_item_widget import InventoryEditItem
 from src.widgets.add_from_file_inventory_widget import AddFromFileInventoryWidget
@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
         self.proxy_model = InventoryFilterProxyModel()
         self.proxy_model.setSourceModel(self.source_table_model)
         self.ui.inventory_table_view.setModel(self.proxy_model)
+        self.ui.inventory_table_view.hideColumn(0)
         self.show()
 
     def _set_up_completer(self):
@@ -38,7 +39,7 @@ class MainWindow(QMainWindow):
 
     def _set_up_table_model(self):
         model = QSqlQueryModel(self)
-        model.setQuery("""SELECT component.material, component.type, component.made_off, component.shape,
+        model.setQuery("""SELECT component.component_id, component.material, component.type, component.made_off, component.shape,
                        component.color, component.finishing_effect, component.component_size, inventory.amount,
                        inventory.other, inventory.unit_price, inventory.total_price, inventory.add_date
                        FROM inventory
@@ -47,7 +48,7 @@ class MainWindow(QMainWindow):
 
     def inventory_add_from_file_clicked(self):
         print("inventory_add_from_file_clicked")
-        inventory_add_from_file = AddFromFileInventoryWidget(self.source_table_model)
+        inventory_add_from_file = AddFromFileInventoryWidget(parent=self, table_model=self.source_table_model)
 
     def inventory_add_manually_clicked(self):
         print("inventory_add_manually_clicked")
