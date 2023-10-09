@@ -37,7 +37,8 @@ class DataBaseConnector:
             for line in sql_file.readlines():
                 self.execute_query(line)
 
-    def execute_query(self, query: str) -> QSqlQuery:
+    @staticmethod
+    def execute_query(query: str) -> QSqlQuery:
         qsql_query = QSqlQuery()
         if not qsql_query.exec(query):
             QMessageBox.critical(

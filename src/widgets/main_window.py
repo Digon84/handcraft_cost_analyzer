@@ -1,8 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex
 from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu, QCompleter
-from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
-
+from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel, QSqlRelation, QSqlQueryModel
 
 from src.inventory_handler import InventoryHandler
 from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
@@ -38,11 +37,12 @@ class MainWindow(QMainWindow):
         return completer
 
     def _set_up_table_model(self):
-        model = QSqlRelationalTableModel(self)
-        model.setTable("items")
-        model.setEditStrategy(QSqlRelationalTableModel.EditStrategy.OnRowChange)
-        model.select()
-
+        model = QSqlQueryModel(self)
+        model.setQuery("""SELECT component.material, component.type, component.made_off, component.shape,
+                       component.color, component.finishing_effect, component.component_size, inventory.amount,
+                       inventory.other, inventory.unit_price, inventory.total_price, inventory.add_date
+                       FROM inventory
+                       INNER JOIN component ON inventory.component_id == component.component_id""")
         return model
 
     def inventory_add_from_file_clicked(self):
