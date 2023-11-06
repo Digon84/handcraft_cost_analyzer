@@ -19,6 +19,7 @@ class AddNewItemManuallyWidget(InventoryItemWidget):
                     row[widget_name] = widget.text()
         # self.table_model.insertRecord(-1, record)
         # self.table_model.select()
+        self.table_model.setQuery(self.table_model.query())
         self.insert_values(row)
         super().accept()
 
