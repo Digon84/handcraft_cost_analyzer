@@ -37,7 +37,7 @@ class FileParser:
         for section in self.sections:
             items = []
             for column_name, values in self.values_to_search_for.items():
-                search_result = re.search('|'.join([v for v in values]), section.lower())
+                search_result = re.search('|'.join([v.lower() for v in values]), section.lower())
                 if search_result:
                     items.append(ParsedItem(column_name=column_name, value=search_result.group(0), parsed_ok=True))
                 else:
@@ -58,27 +58,33 @@ class FileParser:
 
     @staticmethod
     def parse_size(section):
-        regex_number_part = "([0-9]{0,4}[,.]?[0-9]{0,4})"
-        regex_si_units = "(mm|ml)"
+        regex_number_part = " ([0-9]{0,4}[,.]?[0-9]{0,4})"
+        regex_si_units = "(mm|ml) ?"
         reg = f"{regex_number_part} ?{regex_si_units}"
         result = set(re.findall(reg, section))
 
         if len(result) == 1:
             return ' '.join(result.pop())
         else:
-            return None
+            regex_size = "([0-9]{0,3}/[0-9]{1})"
+            result = set(re.findall(regex_size, section))
+            return result.pop() if len(result) == 1 else None
 
     @staticmethod
     def parse_amount(section):
-        regex_number_part = "([0-9]{0,4})"
-        regex_unit = "(szt|pcs|piece)"
+        regex_number_part = "([^/0-9-][0-9]{1,4})"
+        regex_unit = "(szt|Szt|Pcs|pcs|Piece|piece)"
         reg = f"{regex_number_part} ?{regex_unit}"
         result = set(re.findall(reg, section))
 
         if len(result) == 1:
-            return result.pop()[0]
+            return result.pop()[0].strip()
         else:
-            return None
+            # check if the values for all occurrences are the same
+            if len(set([x.strip() for x, y in result])) == 1:
+                return result.pop()[0].strip()
+            else:
+                return None
 
     def get_price(self, section):
         raise NotImplementedError("Function get_price needs to be implemented before use.")
