@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import re
 from csv import DictReader
 
@@ -73,7 +74,9 @@ class ShoppingSummaryParser:
 
     @staticmethod
     def get_predefined_values():
-        # TODO: move hardcode to config file
-        with open("G:\\Python\\handcraft_cost_analyzer\\assets\\predefined\\predefined_values.json",
+        absolute_path = os.path.dirname(__file__)
+        relative_path = "../../assets/predefined/predefined_values.json"
+        full_path = os.path.join(absolute_path, relative_path)
+        with open(full_path,
                   'r', encoding='utf-8') as f:
             return json.loads(f.read())
