@@ -1,5 +1,5 @@
 from PyQt6 import uic
-from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex
+from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex, pyqtSlot
 from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu, QCompleter
 from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel
 
@@ -12,6 +12,7 @@ from src.sqlite_connector import SqliteConnector
 from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.edit_inventory_item_widget import InventoryEditItem
 from src.widgets.add_from_file_inventory_widget import AddFromFileInventoryWidget
+from src.widgets.load_from_file_widget import LoadFromFileWidget
 
 
 class MainWindow(QMainWindow):
@@ -19,6 +20,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = uic.loadUi("src/ui/main_window.ui", self)
         # self.show()
+        self.inventory_add_from_file_window = None
         self.db_connector = InventoryHandler(database_connector=SqliteConnector)
         self.source_table_model = self._set_up_table_model()
         self.ui.inventory_line_edit.setCompleter(self._set_up_completer())
@@ -47,7 +49,14 @@ class MainWindow(QMainWindow):
 
     def inventory_add_from_file_clicked(self):
         print("inventory_add_from_file_clicked")
-        inventory_add_from_file = AddFromFileInventoryWidget(self.source_table_model)
+        # inventory_add_from_file = AddFromFileInventoryWidget(self.source_table_model)
+        columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i for i in
+                   range(self.source_table_model.columnCount())}
+        if self.inventory_add_from_file_window is None:
+            self.inventory_add_from_file_window = LoadFromFileWidget(columns_mapping)
+            self.inventory_add_from_file_window.submitted.connect(self.inventory_update_table)
+        self.inventory_add_from_file_window.show()
+
 
     def inventory_add_manually_clicked(self):
         print("inventory_add_manually_clicked")
@@ -63,6 +72,18 @@ class MainWindow(QMainWindow):
         print("inventory_search")
         self.proxy_model.filter = self.ui.inventory_line_edit.text()
         self.proxy_model.invalidateFilter()
+
+    @pyqtSlot(list)
+    def inventory_update_table(self, table_content_to_be_added):
+        # TODO: change list of lists into structures. It would be easier to parse and set them
+        for i in range(len(table_content_to_be_added)):
+            record = self.source_table_model.record()
+            for j in range(len(table_content_to_be_added[-1])):
+                # TODO: to make it work I needed to change add_date to NOT NULL, in other cases 2 rows were added -
+                #  one with date and one without. Check how it can be handled in the code
+                record.setValue(*table_content_to_be_added[i][j])
+                self.source_table_model.insertRecord(-1, record)
+        self.source_table_model.select()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
