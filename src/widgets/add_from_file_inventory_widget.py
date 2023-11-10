@@ -84,11 +84,11 @@ class AddFromFileInventoryWidget(QDialog):
     def load_from_file_text_window_clicked(self):
         file_dialog = QFileDialog()
         if file_dialog.exec():
-         filenames = file_dialog.selectedFiles()
-         f = open(filenames[0], 'r')
-         with f:
-            data = f.read()
-            self.ui.lineEdit.setText(data)
+            file_names = file_dialog.selectedFiles()
+            f = open(file_names[0], 'r')
+            with f:
+                data = f.read()
+                self.ui.lineEdit.setText(data)
 
         print("load_from_file_text_window_clicked")
 

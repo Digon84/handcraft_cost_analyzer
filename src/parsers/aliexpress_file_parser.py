@@ -24,4 +24,4 @@ class AliexpressFileParser(FileParser):
             prices = findall_result.pop()
             return float(prices[1]), float(prices[0].replace(',', '.'))
         else:
-            return None, None
+            return "", ""

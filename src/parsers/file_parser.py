@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+import datetime
 
 
 @dataclass
@@ -41,17 +42,18 @@ class FileParser:
                 if search_result:
                     items.append(ParsedItem(column_name=column_name, value=search_result.group(0), parsed_ok=True))
                 else:
-                    items.append(ParsedItem(column_name=column_name, value="None", parsed_ok=False))
+                    items.append(ParsedItem(column_name=column_name, value="", parsed_ok=False))
 
             size = self.parse_size(section)
             amount = self.parse_amount(section)
             unit_price = self.parse_unit_price(section)
             total_price = self.parse_total_price(section)
 
-            items.append(ParsedItem(column_name="size", value=size, parsed_ok=size is not None))
-            items.append(ParsedItem(column_name="amount", value=amount, parsed_ok=amount is not None))
-            items.append(ParsedItem(column_name="unit_price", value=unit_price, parsed_ok=unit_price is not None))
-            items.append(ParsedItem(column_name="total_price", value=total_price, parsed_ok=total_price is not None))
+            items.append(ParsedItem(column_name="size", value=size, parsed_ok=size != ""))
+            items.append(ParsedItem(column_name="amount", value=amount, parsed_ok=amount != ""))
+            items.append(ParsedItem(column_name="unit_price", value=unit_price, parsed_ok=unit_price != ""))
+            items.append(ParsedItem(column_name="total_price", value=total_price, parsed_ok=total_price != ""))
+            items.append(ParsedItem(column_name="add_date", value=str(datetime.date.today()), parsed_ok=True))
 
             parsed_items.append(tuple(items))
         return parsed_items
@@ -68,7 +70,7 @@ class FileParser:
         else:
             regex_size = "([0-9]{0,3}/[0-9]{1})"
             result = set(re.findall(regex_size, section))
-            return result.pop() if len(result) == 1 else None
+            return result.pop() if len(result) == 1 else ""
 
     @staticmethod
     def parse_amount(section):
@@ -84,7 +86,7 @@ class FileParser:
             if len(set([x.strip() for x, y in result])) == 1:
                 return result.pop()[0].strip()
             else:
-                return None
+                return ""
 
     def get_price(self, section):
         raise NotImplementedError("Function get_price needs to be implemented before use.")
@@ -95,7 +97,7 @@ class FileParser:
 
     def parse_total_price(self, section):
         multiplier, unit_price = self.get_price(section)
-        if multiplier is not None and unit_price is not None:
+        if multiplier != "" and unit_price != "":
             return multiplier * unit_price
         else:
-            return None
+            return ""
