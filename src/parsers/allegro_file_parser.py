@@ -31,4 +31,4 @@ class AllegroFileParser(FileParser):
             prices = findall_result.pop()
             return float(prices[0]), float(prices[1].replace(',', '.'))
         else:
-            return None, None
+            return "", ""
