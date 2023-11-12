@@ -48,13 +48,10 @@ class MainWindow(QMainWindow):
         return model
 
     def inventory_add_from_file_clicked(self):
-        print("inventory_add_from_file_clicked")
-        # inventory_add_from_file = AddFromFileInventoryWidget(self.source_table_model)
         columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i for i in
-                   range(self.source_table_model.columnCount())}
-        if self.inventory_add_from_file_window is None:
-            self.inventory_add_from_file_window = LoadFromFileWidget(columns_mapping)
-            self.inventory_add_from_file_window.submitted.connect(self.inventory_update_table)
+                           range(self.source_table_model.columnCount())}
+        self.inventory_add_from_file_window = LoadFromFileWidget(columns_mapping)
+        self.inventory_add_from_file_window.submitted.connect(self.inventory_update_table)
         self.inventory_add_from_file_window.show()
 
 

@@ -26,6 +26,7 @@ class LoadFromFileWidget(qtw.QWidget):
         self.cancel_button.clicked.connect(self.close)
         self.ok_button.clicked.connect(self.on_submit)
         self.load_button.clicked.connect(self.load_button_clicked)
+        self.table.cellChanged.connect(self.cell_content_changed)
 
         self.setLayout(layout)
 
@@ -34,10 +35,11 @@ class LoadFromFileWidget(qtw.QWidget):
         layout.addWidget(self.table)
         button_widget = qtw.QWidget()
         button_widget.setLayout(qtw.QHBoxLayout())
+        button_widget.layout().addWidget(self.load_button)
         button_widget.layout().addStretch(1)
         button_widget.layout().addWidget(self.ok_button)
         button_widget.layout().addWidget(self.cancel_button)
-        button_widget.layout().addWidget(self.load_button)
+
         layout.addRow('', button_widget)
         return layout
 
@@ -104,3 +106,13 @@ class LoadFromFileWidget(qtw.QWidget):
 
         self.submitted.emit(table_content)
         self.close()
+
+    def keyPressEvent(self, event):
+        if event.modifiers() & qtc.Qt.KeyboardModifier.ControlModifier:
+            if event.key() == qtc.Qt.Key.Key_V:
+                clipboard_text = qtg.QGuiApplication.clipboard().text()
+                if clipboard_text:
+                    for selected_index in self.table.selectedIndexes():
+                        self.table.item(selected_index.row(), selected_index.column()).setText(clipboard_text)
+
+
