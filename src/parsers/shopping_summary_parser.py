@@ -6,7 +6,7 @@ from csv import DictReader
 
 from src.parsers.aliexpress_file_parser import AliexpressFileParser
 from src.parsers.allegro_file_parser import AllegroFileParser
-from src.parsers.file_parser import ParsedItem
+from src.parsers.file_parser import ParsedItem, Parsed
 
 
 class ShoppingSummaryParser:
@@ -27,11 +27,11 @@ class ShoppingSummaryParser:
                     for key, value in row.items():
                         part_item.append(ParsedItem(column_name=key,
                                                     value=value,
-                                                    parsed_ok=True))
+                                                    parsed_ok=Parsed.OK))
                     # Add current date
                     part_item.append(ParsedItem(column_name="add_date",
                                                 value=str(datetime.date.today()),
-                                                parsed_ok=True))
+                                                parsed_ok=Parsed.OK))
                     parsed_items.append(part_item)
                     part_item = []
                 if parsed_items:
@@ -41,13 +41,7 @@ class ShoppingSummaryParser:
             if separator is not None and shop is not None:
                 file_parser = self.parsers_mapping[shop](f, self.predefined_values, separator)
                 parsed_items = file_parser.parse_file()
-                print("\n\nResults:")
-                for row in parsed_items:
-                    print("******")
-                    for item in row:
-                        print(item.column_name)
-                        print(item.value)
-                        print(item.parsed_ok)
+                print(f"\n\nResults: {parsed_items}")
                 return parsed_items
             else:
                 return None
