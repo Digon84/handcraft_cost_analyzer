@@ -11,7 +11,6 @@ from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 from src.sqlite_connector import SqliteConnector
 from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.edit_inventory_item_widget import InventoryEditItem
-from src.widgets.add_from_file_inventory_widget import AddFromFileInventoryWidget
 from src.widgets.load_from_file_widget import LoadFromFileWidget
 
 
