@@ -5,7 +5,7 @@ from PyQt6 import QtWidgets as qtw
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
 
-from src.parsers.file_parser import ParsedItem
+from src.parsers.file_parser import ParsedItem, Parsed
 from src.parsers.shopping_summary_parser import ShoppingSummaryParser
 
 
@@ -66,16 +66,19 @@ class LoadFromFileWidget(qtw.QWidget):
         table_widget.setColumnCount(len(self.columns_mapping))
         table_widget.setHorizontalHeaderLabels(self.columns_mapping.keys())
 
-    def add_row(self, parsed_items: List[ParsedItem]):
+    def add_row(self, row: dict):
         table_widget: qtw.QTableWidget = self.table
         table_widget.insertRow(table_widget.rowCount())
-        for parsed_item in parsed_items:
+        for parsed_item in row.values():
             next_item = table_widget.rowCount()-1
             column_number = self.columns_mapping[parsed_item.column_name]
             table_widget.setItem(next_item, column_number, qtw.QTableWidgetItem(str(parsed_item.value)))
-            if not parsed_item.parsed_ok:
+            if parsed_item.parsed_ok == Parsed.NOK:
                 table_widget.item(next_item, column_number).setBackground(
                     qtg.QBrush(qtg.QColor(qtg.QColorConstants.Red)))
+            elif parsed_item.parsed_ok == Parsed.CONDITIONAL:
+                table_widget.item(next_item, column_number).setBackground(
+                    qtg.QBrush(qtg.QColor(qtg.QColorConstants.Yellow)))
 
     def cell_content_changed(self, row, column):
         if not self.first_table_fill:
@@ -92,8 +95,8 @@ class LoadFromFileWidget(qtw.QWidget):
             filenames = file_dialog.selectedFiles()
             for file in filenames:
                 parsed_items.extend(self.shopping_summary_parser.parse_file(file))
-        for parsed_item in parsed_items:
-            self.add_row(parsed_item)
+        for row in parsed_items:
+            self.add_row(row)
         self.first_table_fill = False
 
     def on_submit(self):
