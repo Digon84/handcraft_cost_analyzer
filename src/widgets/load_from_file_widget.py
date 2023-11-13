@@ -47,6 +47,7 @@ class LoadFromFileWidget(qtw.QWidget):
         self.columns_mapping = columns_mapping
         self.first_table_fill = True
         self.table = qtw.QTableWidget()
+        self.table.itemChanged.connect(self.set_unit_price)
         self.add_columns()
 
     def setup_buttons(self):
@@ -72,13 +73,20 @@ class LoadFromFileWidget(qtw.QWidget):
         for parsed_item in row.parsed_items.values():
             next_item = table_widget.rowCount()-1
             column_number = self.columns_mapping[parsed_item.column_name]
-            table_widget.setItem(next_item, column_number, qtw.QTableWidgetItem(str(parsed_item.value)))
+            table_item = qtw.QTableWidgetItem(str(parsed_item.value))
             if parsed_item.parsed_ok == Parsed.NOK:
-                table_widget.item(next_item, column_number).setBackground(
-                    qtg.QBrush(qtg.QColor(qtg.QColorConstants.Red)))
+                table_item.setBackground(qtg.QBrush(qtg.QColor(qtg.QColorConstants.Red)))
             elif parsed_item.parsed_ok == Parsed.CONDITIONAL:
-                table_widget.item(next_item, column_number).setBackground(
-                    qtg.QBrush(qtg.QColor(qtg.QColorConstants.Yellow)))
+                table_item.setBackground(qtg.QBrush(qtg.QColor(qtg.QColorConstants.Yellow)))
+            if parsed_item.column_name == "unit_price":
+                total_price = row.parsed_items["total_price"].value
+                amount = row.parsed_items["amount"].value
+                if total_price and amount:
+                    table_item.setText(str(round(float(total_price) / float(amount), 3)))
+                flags = table_item.flags() & ~qtc.Qt.ItemFlag.ItemIsEnabled
+                table_item.setFlags(flags)
+
+            table_widget.setItem(next_item, column_number, table_item)
         return table_widget.rowCount()-1
 
     def cell_content_changed(self, row, column):
@@ -122,4 +130,16 @@ class LoadFromFileWidget(qtw.QWidget):
                     for selected_index in self.table.selectedIndexes():
                         self.table.item(selected_index.row(), selected_index.column()).setText(clipboard_text)
 
+    def set_unit_price(self, item_changed: qtw.QTableWidgetItem):
+        item_changed_row = item_changed.row()
+        item_changed_column = item_changed.column()
+
+        if item_changed_column == 10 or item_changed_column == 7:
+            # TODO: fix hardcodes
+            total_price = self.table.item(item_changed_row, 10).text() if self.table.item(item_changed_row, 10) else ""
+            amount = self.table.item(item_changed_row, 7).text() if self.table.item(item_changed_row, 7) else ""
+
+            if total_price and amount:
+                unit_price_item = self.table.item(item_changed_row, 9)
+                unit_price_item.setText(str(round(float(total_price) / float(amount), 3)))
 
