@@ -1,7 +1,8 @@
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import datetime
 from enum import Enum
+from typing import List
 
 
 class Parsed(Enum):
@@ -16,6 +17,13 @@ class ParsedItem:
         self.column_name: str = column_name
         self.value: str = value
         self.parsed_ok: Parsed = parsed_ok
+
+
+@dataclass
+class Row:
+    def __init__(self, hint: str):
+        self.parsed_items: dict = {}
+        self.hint = hint
 
 
 class FileParser:
@@ -43,36 +51,41 @@ class FileParser:
         self.divide_into_sections()
 
         for section in self.sections:
-            row = {}
+            row = Row(hint="test")
             for column_name, values in self.values_to_search_for.items():
                 search_result = re.search('|'.join([v.lower() for v in values]), section.lower())
                 if search_result:
-                    row[column_name] = ParsedItem(column_name=column_name, value=search_result.group(0),
-                                                  parsed_ok=Parsed.OK)
+                    parsed_ok = Parsed.OK
+                    parsed_value = search_result.group(0)
                 else:
-                    row[column_name] = ParsedItem(column_name=column_name, value="", parsed_ok=Parsed.NOK)
+                    parsed_ok = Parsed.NOK
+                    parsed_value = ""
+                row.parsed_items[column_name] = ParsedItem(column_name=column_name, value=parsed_value,
+                                                           parsed_ok=parsed_ok)
 
             size = self.parse_size(section)
             amount = self.parse_amount(section)
             unit_price = self.parse_unit_price(section)
             total_price = self.parse_total_price(section)
 
-            row["size"] = ParsedItem(column_name="size", value=size, parsed_ok=Parsed.OK if size != "" else Parsed.NOK)
-            row["amount"] = ParsedItem(column_name="amount", value=amount,
-                                       parsed_ok=Parsed.OK if amount != "" else Parsed.NOK)
-            row["unit_price"] = ParsedItem(column_name="unit_price", value=unit_price,
-                                           parsed_ok=Parsed.OK if unit_price != "" else Parsed.NOK)
-            row["total_price"] = ParsedItem(column_name="total_price", value=total_price,
-                                            parsed_ok=Parsed.OK if total_price != "" else Parsed.NOK)
-            row["add_date"] = ParsedItem(column_name="add_date", value=str(datetime.date.today()), parsed_ok=Parsed.OK)
-
+            row.parsed_items["size"] = ParsedItem(column_name="size", value=size,
+                                                  parsed_ok=Parsed.OK if size != "" else Parsed.NOK)
+            row.parsed_items["amount"] = ParsedItem(column_name="amount", value=amount,
+                                                    parsed_ok=Parsed.OK if amount != "" else Parsed.NOK)
+            row.parsed_items["unit_price"] = ParsedItem(column_name="unit_price", value=unit_price,
+                                                        parsed_ok=Parsed.OK if unit_price != "" else Parsed.NOK)
+            row.parsed_items["total_price"] = ParsedItem(column_name="total_price", value=total_price,
+                                                         parsed_ok=Parsed.OK if total_price != "" else Parsed.NOK)
+            row.parsed_items["add_date"] = ParsedItem(column_name="add_date", value=str(datetime.date.today()),
+                                                      parsed_ok=Parsed.OK)
+            row.hint = f"File: {self.file_handle.name} \n\nParsed section:\n{section}"
             self.apply_user_rules(row)
 
             parsed_items.append(row)
         return parsed_items
 
     @staticmethod
-    def apply_user_rules(row):
+    def apply_user_rules(row: Row):
         mapping = [
             {"if": {"column": "type", "value": "TOHO"}, "then": {"column": "material", "value": "koralik"}},
             {"if": {"column": "type", "value": "miyuki"}, "then": {"column": "material", "value": "koralik"}},
@@ -85,9 +98,9 @@ class FileParser:
                    ]
 
         for user_map in mapping:
-            if row[user_map["if"]["column"]].value.lower() == user_map["if"]["value"].lower():
-                row[user_map["then"]["column"]].value = user_map["then"]["value"]
-                row[user_map["then"]["column"]].parsed_ok = Parsed.CONDITIONAL
+            if row.parsed_items[user_map["if"]["column"]].value.lower() == user_map["if"]["value"].lower():
+                row.parsed_items[user_map["then"]["column"]].value = user_map["then"]["value"]
+                row.parsed_items[user_map["then"]["column"]].parsed_ok = Parsed.CONDITIONAL
 
 
     @staticmethod
