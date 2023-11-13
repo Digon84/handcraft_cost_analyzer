@@ -41,7 +41,6 @@ class ShoppingSummaryParser:
             if separator is not None and shop is not None:
                 file_parser = self.parsers_mapping[shop](f, self.predefined_values, separator)
                 parsed_items = file_parser.parse_file()
-                print(f"\n\nResults: {parsed_items}")
                 return parsed_items
             else:
                 return None

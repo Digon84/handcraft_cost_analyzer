@@ -7,15 +7,17 @@ from PyQt6 import QtGui as qtg
 
 from src.parsers.file_parser import ParsedItem, Parsed, Row
 from src.parsers.shopping_summary_parser import ShoppingSummaryParser
+from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 
 
 class LoadFromFileWidget(qtw.QWidget):
 
     submitted = qtc.pyqtSignal(list)
 
-    def __init__(self, columns_mapping):
+    def __init__(self, columns_mapping, source_table_model):
         super().__init__()
         self.shopping_summary_parser = ShoppingSummaryParser()
+        self.source_table_model = source_table_model
 
         self.setup_window()
         self.setup_table(columns_mapping)
@@ -67,6 +69,7 @@ class LoadFromFileWidget(qtw.QWidget):
         table_widget.setColumnCount(len(self.columns_mapping))
         table_widget.setHorizontalHeaderLabels(self.columns_mapping.keys())
 
+
     def add_row(self, row: Row) -> int:
         table_widget: qtw.QTableWidget = self.table
         table_widget.insertRow(table_widget.rowCount())
@@ -109,6 +112,11 @@ class LoadFromFileWidget(qtw.QWidget):
             item = self.table.item(row_index, 0)
             if item:
                 item.setToolTip(row.hint)
+
+        completer = TableItemCompleter(self.source_table_model)
+        for i in range(len(self.columns_mapping)):
+            self.table.setItemDelegateForColumn(i, completer)
+
         self.first_table_fill = False
 
     def on_submit(self):
@@ -143,3 +151,25 @@ class LoadFromFileWidget(qtw.QWidget):
                 unit_price_item = self.table.item(item_changed_row, 9)
                 unit_price_item.setText(str(round(float(total_price) / float(amount), 3)))
 
+
+class TableItemCompleter(qtw.QStyledItemDelegate):
+    def __init__(self, source_table_model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.source_table_model = source_table_model
+
+    def createEditor(self, parent, option, index):
+        editor = qtw.QLineEdit(parent)
+        auto_completer = self.get_completer(index.column())
+        editor.setCompleter(auto_completer)
+        return editor
+
+    def get_completer(self, column):
+        completer_proxy_model = UniqueItemsProxyModel(self)
+        completer_proxy_model.setSourceModel(self.source_table_model)
+        completer_proxy_model.setFilterKeyColumn(column)
+        completer_proxy_model.set_desired_column(column)
+        completer = qtw.QCompleter(completer_proxy_model)
+        completer.setCaseSensitivity(qtc.Qt.CaseSensitivity.CaseInsensitive)
+        completer.setCompletionColumn(column)
+
+        return completer
