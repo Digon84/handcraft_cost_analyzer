@@ -105,7 +105,7 @@ class FileParser:
 
     @staticmethod
     def parse_size(section):
-        regex_number_part = " ([0-9]{0,4}[,.]?[0-9]{0,4})"
+        regex_number_part = "([0-9]{0,4}[,.]?[0-9]{0,4})"
         regex_si_units = "(mm|ml) ?"
         reg = f"{regex_number_part} ?{regex_si_units}"
         result = set(re.findall(reg, section))
