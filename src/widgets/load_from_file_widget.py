@@ -5,7 +5,7 @@ from PyQt6 import QtWidgets as qtw
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
 
-from src.parsers.file_parser import ParsedItem, Parsed
+from src.parsers.file_parser import ParsedItem, Parsed, Row
 from src.parsers.shopping_summary_parser import ShoppingSummaryParser
 
 
@@ -66,10 +66,10 @@ class LoadFromFileWidget(qtw.QWidget):
         table_widget.setColumnCount(len(self.columns_mapping))
         table_widget.setHorizontalHeaderLabels(self.columns_mapping.keys())
 
-    def add_row(self, row: dict):
+    def add_row(self, row: Row) -> int:
         table_widget: qtw.QTableWidget = self.table
         table_widget.insertRow(table_widget.rowCount())
-        for parsed_item in row.values():
+        for parsed_item in row.parsed_items.values():
             next_item = table_widget.rowCount()-1
             column_number = self.columns_mapping[parsed_item.column_name]
             table_widget.setItem(next_item, column_number, qtw.QTableWidgetItem(str(parsed_item.value)))
@@ -79,6 +79,7 @@ class LoadFromFileWidget(qtw.QWidget):
             elif parsed_item.parsed_ok == Parsed.CONDITIONAL:
                 table_widget.item(next_item, column_number).setBackground(
                     qtg.QBrush(qtg.QColor(qtg.QColorConstants.Yellow)))
+        return table_widget.rowCount()-1
 
     def cell_content_changed(self, row, column):
         if not self.first_table_fill:
@@ -96,7 +97,10 @@ class LoadFromFileWidget(qtw.QWidget):
             for file in filenames:
                 parsed_items.extend(self.shopping_summary_parser.parse_file(file))
         for row in parsed_items:
-            self.add_row(row)
+            row_index = self.add_row(row)
+            item = self.table.item(row_index, 0)
+            if item:
+                item.setToolTip(row.hint)
         self.first_table_fill = False
 
     def on_submit(self):
