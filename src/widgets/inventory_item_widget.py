@@ -10,6 +10,7 @@ from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 class InventoryItemWidget(QDialog):
     def __init__(self, table_model: QSqlRelationalTableModel):
         super().__init__()
+        self.line_edit_mapping = {}
         self.table_model = table_model
         self.setWindowTitle("Update item")
         self.buttons = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -33,10 +34,18 @@ class InventoryItemWidget(QDialog):
 
             if column_name == "add_date":
                 line_edit.setText(str(datetime.date.today()))
+                line_edit.setDisabled(True)
+
+            if column_name == "unit_price":
+                line_edit.setDisabled(True)
+
+            if column_name == "total_price" or column_name == "amount":
+                print(f"setting for: {column_name}")
+                line_edit.editingFinished.connect(self.set_unit_price)
 
             grid_layout.addWidget(label, i, 0)
             grid_layout.addWidget(line_edit, i, 1)
-
+            self.line_edit_mapping[column_name] = line_edit
             self.setLayout(grid_layout)
 
         layout = QVBoxLayout()
@@ -54,3 +63,10 @@ class InventoryItemWidget(QDialog):
         completer.setCompletionColumn(column)
 
         return completer
+
+    def set_unit_price(self):
+        total_price = self.line_edit_mapping["total_price"].text()
+        amount = self.line_edit_mapping["amount"].text()
+        if total_price and amount:
+            unit_price = round(float(total_price.replace(',', '.')) / float(amount.replace(',', '.')), 3)
+            self.line_edit_mapping["unit_price"].setText(str(unit_price))
