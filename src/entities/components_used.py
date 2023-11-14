@@ -10,4 +10,4 @@ class ComponentsUsed:
     total_price: float = 0.0
 
     def __post_init__(self):
-        self.total_price = round(self.amount * self.unit_price, 3)
+        self.unit_price = round(self.total_price / self.amount, 3)
