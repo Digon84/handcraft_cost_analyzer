@@ -25,10 +25,11 @@ class InventoryItemWidget(QDialog):
         grid_layout = QGridLayout()
 
         for i, column in enumerate(INVENTORY_TABLE_LAYOUT):
-            column_name = self.table_model.headerData(i, Qt.Orientation.Horizontal)
+            # column_name = self.table_model.headerData(i, Qt.Orientation.Horizontal)
             # Don't drow for component_id. It is only used in queries.
-            if column_name == "component_id":
+            if column.is_hidden:
                 continue
+
             label = QLabel(column.column_name + ("*" if column.is_mandatory else ""))
             line_edit = QLineEdit()
             line_edit.setObjectName(column.column_name)
@@ -39,18 +40,18 @@ class InventoryItemWidget(QDialog):
                 line_edit.setText(str(datetime.date.today()))
                 line_edit.setDisabled(True)
 
-            if column_name == "unit_price":
+            if column.is_disabled:
                 line_edit.setDisabled(True)
 
-            if column_name == "total_price" or column_name == "amount":
-                print(f"setting for: {column_name}")
+            if column.column_name == "total_price" or column.column_name == "amount":
+                print(f"setting for: {column.column_name}")
                 line_edit.editingFinished.connect(self.set_unit_price)
 
             if column.is_disabled:
                 line_edit.setDisabled(True)
             grid_layout.addWidget(label, i, 0)
             grid_layout.addWidget(line_edit, i, 1)
-            self.line_edit_mapping[column_name] = line_edit
+            self.line_edit_mapping[column.column_name] = line_edit
             self.setLayout(grid_layout)
 
         layout = QVBoxLayout()

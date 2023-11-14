@@ -1,8 +1,7 @@
-from PyQt6.QtCore import Qt
 from PyQt6.QtSql import QSqlQuery
-from PyQt6.QtWidgets import QDataWidgetMapper, QDialogButtonBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit
+from PyQt6.QtWidgets import QDataWidgetMapper
 
-from src.widgets.inventory_item_widget import InventoryItemWidget
+from src.widgets.inventory.inventory_item_widget import InventoryItemWidget
 
 
 class InventoryEditItem(InventoryItemWidget):

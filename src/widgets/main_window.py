@@ -1,17 +1,18 @@
 from PyQt6 import uic
 
-from PyQt6.QtCore import Qt, QSortFilterProxyModel, QModelIndex, pyqtSlot, pyqtSignal
-from PyQt6.QtWidgets import QMainWindow, QTreeView, QMessageBox, QMenu, QCompleter
-from PyQt6.QtSql import QSqlTableModel, QSqlRelationalTableModel, QSqlQueryModel
+from PyQt6.QtCore import Qt, pyqtSlot, pyqtSignal
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter
+from PyQt6.QtSql import QSqlQueryModel
 
 from src.database.inventory_handler import InventoryHandler
+from src.database.table_layouts import INVENTORY_TABLE_LAYOUT
 from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
 from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 from src.database.sqlite_connector import SqliteConnector
-from src.widgets.add_new_item_manually_widget import AddNewItemManuallyWidget
-from src.widgets.edit_inventory_item_widget import InventoryEditItem
-from src.widgets.load_from_file_widget import LoadFromFileWidget
+from src.widgets.inventory.add_new_item_manually_widget import AddNewItemManuallyWidget
+from src.widgets.inventory.edit_inventory_item_widget import InventoryEditItem
+from src.widgets.inventory.load_from_file_widget import LoadFromFileWidget
 
 
 class MainWindow(QMainWindow):
@@ -29,7 +30,9 @@ class MainWindow(QMainWindow):
         self.proxy_model = InventoryFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.source_table_model)
         self.ui.inventory_table_view.setModel(self.proxy_model)
-        self.ui.inventory_table_view.hideColumn(0)
+        for i, column in enumerate(INVENTORY_TABLE_LAYOUT):
+            if column.is_hidden:
+                self.ui.inventory_table_view.hideColumn(i)
         self.show()
 
     def _set_up_completer(self):
