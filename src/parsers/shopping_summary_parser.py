@@ -59,7 +59,6 @@ class ShoppingSummaryParser:
         file_handle.seek(0)  # TODO: (double-read) reset the file cursor. Can it be handled in a different way?
         for regex, shop in identifiers_mapping.items():
             if re.search(regex, file_content):
-                print(f'{file_handle.name} - {shop}')
                 return regex, shop
             else:
                 continue

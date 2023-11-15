@@ -44,7 +44,6 @@ class InventoryItemWidget(QDialog):
                 line_edit.setDisabled(True)
 
             if column.column_name == "total_price" or column.column_name == "amount":
-                print(f"setting for: {column.column_name}")
                 line_edit.editingFinished.connect(self.set_unit_price)
 
             if column.is_disabled:

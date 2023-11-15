@@ -19,7 +19,7 @@ class ComponentDAO:
         result = self.query.exec()
 
         if result:
-            return self.query.result().lastInsertId()
+            return self.query.result().lastInsertId(), ""
         else:
             return -1, self.query.lastError().text()
 

@@ -7,7 +7,6 @@ class InventoryFilterProxyModel(QSortFilterProxyModel):
         self.filter = ""
 
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
-        print(f"filterAcceptsRow {self.sourceModel().rowCount()}")
         if self.filter != "":
             for column in range(self.sourceModel().columnCount()):
                 first_column_index = self.sourceModel().index(source_row, column, source_parent)

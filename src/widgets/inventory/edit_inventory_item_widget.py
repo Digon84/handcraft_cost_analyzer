@@ -16,7 +16,6 @@ class InventoryEditItem(InventoryItemWidget):
     def connect_mapper(self):
         self.mapper.setModel(self.table_model)
         row_data = {}
-        print(self.layout().count())
         for i in range(self.layout().count()):
             widget = self.layout().itemAt(i).widget()
             if widget is not None:

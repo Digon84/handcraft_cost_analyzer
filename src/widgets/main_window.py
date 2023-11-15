@@ -64,7 +64,6 @@ class MainWindow(QMainWindow):
         self.inventory_add_from_file_window.show()
 
     def inventory_add_manually_clicked(self):
-        print("inventory_add_manually_clicked")
         add_new_item = AddNewItemManuallyWidget(self.source_table_model)
 
         self.source_table_model.setQuery(self.query)
@@ -73,18 +72,12 @@ class MainWindow(QMainWindow):
                                                                                self.source_table_model.columnCount()),
                                                  [])
 
-        print(f"row count: {self.source_table_model.rowCount()}")
-        # self.proxy_model.setSourceModel(self.source_table_model)
-
-
     def inventory_edit_item(self, model_index):
-        print("inventory_table_view")
         # TODO: check if this is needed. Can we have one index?
         source_index = self.proxy_model.mapToSource(model_index)
         inventory_edit = InventoryEditItem(self.source_table_model, source_index)
 
     def inventory_search_clicked(self):
-        print("inventory_search")
         self.proxy_model.filter = self.ui.inventory_line_edit.text()
         self.proxy_model.invalidateFilter()
 
