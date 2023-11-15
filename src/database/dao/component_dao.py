@@ -7,9 +7,9 @@ class ComponentDAO:
     def __init__(self):
         self.query = QSqlQuery()
 
-    def insert_component(self, component: Component) -> int:
+    def insert_component(self, component: Component) -> (int, str):
         """
-        Returns inserted component id or -1 if query was not executed properly
+        Returns inserted component id or -1, error_message if query was not executed properly
         """
         self.query.prepare("INSERT INTO component(material, type, made_off, shape, color, finishing_effect,"
                            "component_size) VALUES(:material, :type, :made_off, :shape, :color,"
@@ -20,10 +20,10 @@ class ComponentDAO:
 
         if result:
             return self.query.result().lastInsertId()
-        elif result and not self.query.next():
-            return -1
+        else:
+            return -1, self.query.lastError().text()
 
-    def get_component_id(self, component: Component) -> int:
+    def get_component_id(self, component: Component) -> (int, str):
         """
         Returns component id or -1 if the entry with desired parameters does not exist.
         """
@@ -36,23 +36,23 @@ class ComponentDAO:
         result = self.query.exec()
 
         if self.query.next():
-            return self.query.value("component_id")
-        elif result and not self.query.next():
-            return -1
+            return self.query.value("component_id"), ""
+        else:
+            return -1, self.query.lastError().text()
 
     def get_component_id_or_insert(self, component: Component):
-        component_id = self.get_component_id(component)
+        component_id, error_message = self.get_component_id(component)
         if component_id == -1:
-            component_id = self.insert_component(component)
+            component_id, error_message = self.insert_component(component)
 
         if component_id == -1:
-            print("Could not add component.")
+            error_message = self.query.lastError().text()
 
-        return component_id
+        return component_id, error_message
 
     def bind_values(self, component: Component):
         self.query.bindValue(":material", component.material)
-        self.query.bindValue(":type", component.component_type)
+        self.query.bindValue(":type", component.type)
         self.query.bindValue(":made_off", component.made_off)
         self.query.bindValue(":shape", component.shape)
         self.query.bindValue(":color", component.color)

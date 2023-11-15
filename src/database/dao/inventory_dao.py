@@ -11,7 +11,7 @@ class InventoryDAO:
     def update(self, inventory: Inventory):
         pass
 
-    def insert(self, inventory: Inventory):
+    def insert(self, inventory: Inventory) -> (bool, str):
         if inventory.component_id == -1:
             component_dao = ComponentDAO()
 
@@ -29,4 +29,5 @@ class InventoryDAO:
         query.bindValue(":add_date", inventory.add_date)
 
         result = query.exec()
-        print(result)
+        return result, query.lastError().text()
+
