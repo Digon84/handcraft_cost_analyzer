@@ -5,6 +5,9 @@ from PyQt6 import QtWidgets as qtw
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
 
+from src.entities.inventory import Inventory
+from src.database.dao.component_dao import ComponentDAO
+from src.database.dao.inventory_dao import InventoryDAO
 from src.parsers.file_parser import ParsedItem, Parsed, Row
 from src.parsers.shopping_summary_parser import ShoppingSummaryParser
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
@@ -18,7 +21,8 @@ class LoadFromFileWidget(qtw.QWidget):
         super().__init__()
         self.shopping_summary_parser = ShoppingSummaryParser()
         self.source_table_model = source_table_model
-
+        self.component_dao = ComponentDAO()
+        self.inventory_dao = InventoryDAO()
         self.setup_window()
         self.setup_table(columns_mapping)
         self.setup_buttons()
@@ -121,10 +125,10 @@ class LoadFromFileWidget(qtw.QWidget):
     def on_submit(self):
         table_content = []
         for i in range(self.table.rowCount()):
-            row = []
+            row = {}
             for j in range(self.table.columnCount()):
-                row.append((self.table.horizontalHeaderItem(j).text(), self.table.item(i, j).text()))
-            table_content.append(row)
+                row[self.table.horizontalHeaderItem(j).text()] = self.table.item(i, j).text()
+            table_content.append(Inventory(row))
 
         self.submitted.emit(table_content)
         self.close()
@@ -141,10 +145,10 @@ class LoadFromFileWidget(qtw.QWidget):
         item_changed_row = item_changed.row()
         item_changed_column = item_changed.column()
 
-        if item_changed_column == 10 or item_changed_column == 7:
+        if item_changed_column == 10 or item_changed_column == 8:
             # TODO: fix hardcodes
             total_price = self.table.item(item_changed_row, 10).text() if self.table.item(item_changed_row, 10) else ""
-            amount = self.table.item(item_changed_row, 7).text() if self.table.item(item_changed_row, 7) else ""
+            amount = self.table.item(item_changed_row, 8).text() if self.table.item(item_changed_row, 8) else ""
 
             if total_price and amount:
                 unit_price_item = self.table.item(item_changed_row, 9)

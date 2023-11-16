@@ -4,8 +4,11 @@ from PyQt6.QtCore import Qt, pyqtSlot, pyqtSignal
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter
 from PyQt6.QtSql import QSqlQueryModel
 
+from src.database.dao.component_dao import ComponentDAO
+from src.database.dao.inventory_dao import InventoryDAO
 from src.database.inventory_handler import InventoryHandler
 from src.database.table_layouts import INVENTORY_TABLE_LAYOUT
+from src.entities.inventory import Inventory
 from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
 from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
@@ -23,8 +26,11 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = uic.loadUi("src/ui/main_window.ui", self)
         # self.show()
+
         self.inventory_add_from_file_window = None
         self.db_connector = InventoryHandler(database_connector=SqliteConnector)
+        self.component_dao = ComponentDAO()
+        self.inventory_dao = InventoryDAO()
         self.source_table_model = self._set_up_table_model()
         self.ui.inventory_line_edit.setCompleter(self._set_up_completer())
         self.proxy_model = InventoryFilterProxyModel(self)
@@ -57,20 +63,18 @@ class MainWindow(QMainWindow):
         return model
 
     def inventory_add_from_file_clicked(self):
-        columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i for i in
-                           range(self.source_table_model.columnCount())}
+        # TODO: make unique column identification, not to hardcode, i-1 for skipping component_id
+        columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i - 1 for i in
+                           range(self.source_table_model.columnCount()) if
+                           self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "component_id"}
         self.inventory_add_from_file_window = LoadFromFileWidget(columns_mapping, self.source_table_model)
-        self.inventory_add_from_file_window.submitted.connect(self.inventory_update_table)
+        self.inventory_add_from_file_window.submitted.connect(self.store_rows_into_inventory)
         self.inventory_add_from_file_window.show()
 
     def inventory_add_manually_clicked(self):
-        add_new_item = AddNewItemManuallyWidget(self.source_table_model)
-
-        self.source_table_model.setQuery(self.query)
-        self.source_table_model.dataChanged.emit(self.source_table_model.index(0, 0),
-                                                 self.source_table_model.index(self.source_table_model.rowCount(),
-                                                                               self.source_table_model.columnCount()),
-                                                 [])
+        self.add_new_item = AddNewItemManuallyWidget(self.source_table_model)
+        self.add_new_item.submitted.connect(self.store_rows_into_inventory)
+        self.add_new_item.show()
 
     def inventory_edit_item(self, model_index):
         # TODO: check if this is needed. Can we have one index?
@@ -80,18 +84,6 @@ class MainWindow(QMainWindow):
     def inventory_search_clicked(self):
         self.proxy_model.filter = self.ui.inventory_line_edit.text()
         self.proxy_model.invalidateFilter()
-
-    @pyqtSlot(list)
-    def inventory_update_table(self, table_content_to_be_added):
-        # TODO: change list of lists into structures. It would be easier to parse and set them
-        for i in range(len(table_content_to_be_added)):
-            record = self.source_table_model.record()
-            for j in range(len(table_content_to_be_added[-1])):
-                # TODO: to make it work I needed to change add_date to NOT NULL, in other cases 2 rows were added -
-                #  one with date and one without. Check how it can be handled in the code
-                record.setValue(*table_content_to_be_added[i][j])
-                self.source_table_model.insertRecord(-1, record)
-        self.source_table_model.select()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
@@ -110,3 +102,39 @@ class MainWindow(QMainWindow):
                 self.source_table_model.removeRow(index.row())
                 self.source_table_model.submitAll()
                 self.source_table_model.select()
+
+    @pyqtSlot(list)
+    def store_rows_into_inventory(self, table_content_to_be_inserted):
+        print(f"before insert: {self.source_table_model.rowCount()}")
+        for item in table_content_to_be_inserted:
+            self.store_inventory_item_into_db(item)
+
+        self.source_table_model.setQuery(self.query)
+        print(f"after insert: {self.source_table_model.rowCount()}")
+        self.source_table_model.dataChanged.emit(self.source_table_model.index(0, 0),
+                                                 self.source_table_model.index(self.source_table_model.rowCount(),
+                                                                               self.source_table_model.columnCount()),
+                                                 [])
+
+    def store_inventory_item_into_db(self, inventory_item):
+        print("store_inventory_item_into_db")
+        component_id, error_message = self.component_dao.get_component_id_or_insert(inventory_item.component)
+        if component_id != -1:
+            inventory_item.component_id = component_id
+            result, error_message = self.inventory_dao.insert(inventory_item)
+        else:
+            result = False
+
+        if not result:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setText("Cannot add inventory item into database.")
+            msg.setInformativeText(
+                f"One or more items could not be added to database: \n{error_message}"
+            )
+            msg.setStandardButtons(
+                QMessageBox.StandardButton.Yes
+            )
+            msg.exec()
+
+        return result, error_message
