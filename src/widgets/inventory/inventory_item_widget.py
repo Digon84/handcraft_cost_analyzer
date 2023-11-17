@@ -1,14 +1,15 @@
 import datetime
 
 from PyQt6.QtCore import Qt, QSortFilterProxyModel
-from PyQt6.QtSql import QSqlRelationalTableModel
+from PyQt6.QtSql import QSqlRelationalTableModel, QSqlQueryModel
 from PyQt6.QtWidgets import QDialogButtonBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, QDialog, QCompleter
 
+from src.database.table_layouts import INVENTORY_TABLE_LAYOUT
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 
 
 class InventoryItemWidget(QDialog):
-    def __init__(self, table_model: QSqlRelationalTableModel):
+    def __init__(self, table_model: QSqlQueryModel):
         super().__init__()
         self.line_edit_mapping = {}
         self.table_model = table_model
@@ -23,29 +24,33 @@ class InventoryItemWidget(QDialog):
 
         grid_layout = QGridLayout()
 
-        for i in range(self.table_model.columnCount()):
-            column_name = self.table_model.headerData(i, Qt.Orientation.Horizontal)
+        for i, column in enumerate(INVENTORY_TABLE_LAYOUT):
+            # column_name = self.table_model.headerData(i, Qt.Orientation.Horizontal)
+            # Don't drow for component_id. It is only used in queries.
+            if column.is_hidden:
+                continue
 
-            label = QLabel(column_name)
+            label = QLabel(column.column_name + ("*" if column.is_mandatory else ""))
             line_edit = QLineEdit()
-            line_edit.setObjectName(column_name)
-            line_edit.setProperty("name", column_name)
+            line_edit.setObjectName(column.column_name)
+            line_edit.setProperty("name", column.column_name)
             line_edit.setCompleter(self.get_completer(i))
 
-            if column_name == "add_date":
+            if column.column_name == "add_date":
                 line_edit.setText(str(datetime.date.today()))
                 line_edit.setDisabled(True)
 
-            if column_name == "unit_price":
+            if column.is_disabled:
                 line_edit.setDisabled(True)
 
-            if column_name == "total_price" or column_name == "amount":
-                print(f"setting for: {column_name}")
+            if column.column_name == "total_price" or column.column_name == "amount":
                 line_edit.editingFinished.connect(self.set_unit_price)
 
+            if column.is_disabled:
+                line_edit.setDisabled(True)
             grid_layout.addWidget(label, i, 0)
             grid_layout.addWidget(line_edit, i, 1)
-            self.line_edit_mapping[column_name] = line_edit
+            self.line_edit_mapping[column.column_name] = line_edit
             self.setLayout(grid_layout)
 
         layout = QVBoxLayout()

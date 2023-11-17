@@ -1,5 +1,4 @@
-from src.database_connector import DataBaseConnector
-from PyQt6.QtSql import QSqlQuery
+from src.database.database_connector import DataBaseConnector
 
 
 class InventoryHandlerMeta(type):

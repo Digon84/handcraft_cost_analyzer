@@ -28,7 +28,7 @@ class Row:
 
 class FileParser:
     # TODO: get rid of values_to_search_for and section_identifier??
-    def __init__(self, file_handle, values_to_search_for=[], section_identifier=""):
+    def __init__(self, file_handle, values_to_search_for={}, section_identifier=""):
         self.file_handle = file_handle
         self.values_to_search_for = values_to_search_for
         self.section_identifier = section_identifier
@@ -63,13 +63,13 @@ class FileParser:
                 row.parsed_items[column_name] = ParsedItem(column_name=column_name, value=parsed_value,
                                                            parsed_ok=parsed_ok)
 
-            size = self.parse_size(section)
+            component_size = self.parse_size(section)
             amount = self.parse_amount(section)
             unit_price = self.parse_unit_price(section)
             total_price = self.parse_total_price(section)
 
-            row.parsed_items["size"] = ParsedItem(column_name="size", value=size,
-                                                  parsed_ok=Parsed.OK if size != "" else Parsed.NOK)
+            row.parsed_items["component_size"] = ParsedItem(column_name="component_size", value=component_size,
+                                                  parsed_ok=Parsed.OK if component_size != "" else Parsed.NOK)
             row.parsed_items["amount"] = ParsedItem(column_name="amount", value=amount,
                                                     parsed_ok=Parsed.OK if amount != "" else Parsed.NOK)
             row.parsed_items["unit_price"] = ParsedItem(column_name="unit_price", value=unit_price,

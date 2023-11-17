@@ -2,8 +2,8 @@ from PyQt6.QtCore import QSortFilterProxyModel, QModelIndex
 
 
 class InventoryFilterProxyModel(QSortFilterProxyModel):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.filter = ""
 
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
@@ -17,3 +17,7 @@ class InventoryFilterProxyModel(QSortFilterProxyModel):
         else:
             return True
         return False
+
+    def setSourceModel(self, source_model):
+
+        super().setSourceModel(source_model)
