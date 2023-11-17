@@ -8,8 +8,22 @@ class InventoryDAO:
     def __init__(self):
         pass
 
-    def update(self, inventory: Inventory):
-        pass
+    def update(self, inventory_id: int, inventory: Inventory):
+        query = QSqlQuery()
+        query.prepare(f"UPDATE inventory SET component_id = :component_id, amount = :amount,"
+                      "other = :other, unit_price = :unit_price, total_price = :total_price, add_date = :add_date "
+                      "WHERE inventory_id = :inventory_id")
+
+        query.bindValue(":component_id", inventory.component_id)
+        query.bindValue(":amount", inventory.amount)
+        query.bindValue(":other", inventory.other)
+        query.bindValue(":unit_price", inventory.unit_price)
+        query.bindValue(":total_price", inventory.total_price)
+        query.bindValue(":add_date", inventory.add_date)
+        query.bindValue(":inventory_id", inventory_id)
+
+        result = query.exec()
+        return result, query.lastError().text()
 
     def insert(self, inventory: Inventory) -> (bool, str):
         if inventory.component_id == -1:
@@ -31,3 +45,9 @@ class InventoryDAO:
         result = query.exec()
         return result, query.lastError().text()
 
+    def delete(self, inventory_id: int):
+        query = QSqlQuery()
+        query.prepare(f"DELETE FROM inventory WHERE inventory_id={inventory_id}")
+
+        result = query.exec()
+        return result, query.lastError().text()

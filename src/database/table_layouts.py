@@ -10,6 +10,7 @@ class Column:
 
 
 INVENTORY_TABLE_LAYOUT = (
+    Column(column_name="inventory_id", is_hidden=True),
     Column(column_name="Component_id", is_hidden=True),
     Column(column_name="material"),
     Column(column_name="type"),

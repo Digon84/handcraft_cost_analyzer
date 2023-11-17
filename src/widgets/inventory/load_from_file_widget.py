@@ -65,7 +65,7 @@ class LoadFromFileWidget(qtw.QWidget):
         self.cancel_button.setFixedSize(qtc.QSize(120, 25))
 
     def setup_window(self):
-        self.resize(qtc.QSize(1250, 600))
+        self.resize(qtc.QSize(1270, 600))
         self.setWindowTitle("Load from file")
 
     def add_columns(self):
@@ -117,8 +117,8 @@ class LoadFromFileWidget(qtw.QWidget):
                 item.setToolTip(row.hint)
 
         completer = TableItemCompleter(self.source_table_model)
-        for i in range(len(self.columns_mapping)):
-            self.table.setItemDelegateForColumn(i, completer)
+        for column in self.columns_mapping.values():
+            self.table.setItemDelegateForColumn(column, completer)
 
         self.first_table_fill = False
 
@@ -162,7 +162,8 @@ class TableItemCompleter(qtw.QStyledItemDelegate):
 
     def createEditor(self, parent, option, index):
         editor = qtw.QLineEdit(parent)
-        auto_completer = self.get_completer(index.column())
+        # TODO: get rid of hardcodes. column + 2 since we are ignoring inventory_id and component_id
+        auto_completer = self.get_completer(index.column() + 2)
         editor.setCompleter(auto_completer)
         return editor
 

@@ -18,7 +18,6 @@ class AddFromFileInventoryWidget(QDialog):
         self.ui = uic.loadUi("src/ui/load_from_file_widget.ui", self)
         self.columns_mapping = {self.table_model.headerData(i, Qt.Orientation.Horizontal): i for i in
                                 range(self.table_model.columnCount())}
-        print(self.columns_mapping)
         self.shopping_summary_parser = ShoppingSummaryParser()
         self.add_columns()
 
@@ -47,7 +46,6 @@ class AddFromFileInventoryWidget(QDialog):
         parsed_items = []
         if file_dialog.exec():
             filenames = file_dialog.selectedFiles()
-            print(f"filenames: {filenames}")
             for file in filenames:
                 parsed_items.extend(self.shopping_summary_parser.parse_file(file))
         for parsed_item in parsed_items:
@@ -88,8 +86,6 @@ class AddFromFileInventoryWidget(QDialog):
          with f:
             data = f.read()
             self.ui.lineEdit.setText(data)
-
-        print("load_from_file_text_window_clicked")
 
     @staticmethod
     def get_distinct_values_for_column(column_name) -> List:

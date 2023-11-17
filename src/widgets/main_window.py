@@ -53,8 +53,9 @@ class MainWindow(QMainWindow):
 
     def _set_up_table_model(self):
         model = QSqlQueryModel(self)
-        self.query = """SELECT component.component_id, component.material, component.type, component.made_off, component.shape,
-                       component.color, component.finishing_effect, component.component_size, inventory.amount,
+        self.query = """SELECT inventory.inventory_id, component.component_id, component.material, component.type,
+        component.made_off, component.shape, 
+        component.color, component.finishing_effect, component.component_size, inventory.amount,
                        inventory.other, inventory.unit_price, inventory.total_price, inventory.add_date
                        FROM inventory
                        INNER JOIN component ON inventory.component_id == component.component_id"""
@@ -63,10 +64,11 @@ class MainWindow(QMainWindow):
         return model
 
     def inventory_add_from_file_clicked(self):
-        # TODO: make unique column identification, not to hardcode, i-1 for skipping component_id
-        columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i - 1 for i in
+        # TODO: make unique column identification, not to hardcode, i-2 for skipping component_id
+        columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i - 2 for i in
                            range(self.source_table_model.columnCount()) if
-                           self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "component_id"}
+                           self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "component_id" and
+                           self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "inventory_id"}
         self.inventory_add_from_file_window = LoadFromFileWidget(columns_mapping, self.source_table_model)
         self.inventory_add_from_file_window.submitted.connect(self.store_rows_into_inventory)
         self.inventory_add_from_file_window.show()
@@ -79,7 +81,9 @@ class MainWindow(QMainWindow):
     def inventory_edit_item(self, model_index):
         # TODO: check if this is needed. Can we have one index?
         source_index = self.proxy_model.mapToSource(model_index)
-        inventory_edit = InventoryEditItem(self.source_table_model, source_index)
+        self.inventory_edit = InventoryEditItem(self.source_table_model, source_index)
+        self.inventory_edit.submitted.connect(self.update_rows_in_inventory)
+        self.inventory_edit.show()
 
     def inventory_search_clicked(self):
         self.proxy_model.filter = self.ui.inventory_line_edit.text()
@@ -97,44 +101,73 @@ class MainWindow(QMainWindow):
                 msg.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 )
-                msg.exec()
-                index = self.ui.inventory_table_view.selectedIndexes()[0]
-                self.source_table_model.removeRow(index.row())
-                self.source_table_model.submitAll()
-                self.source_table_model.select()
+                reply = msg.exec()
+                if reply == QMessageBox.StandardButton.Yes:
+                    selected_index = self.ui.inventory_table_view.selectedIndexes()[0]
+                    inventory_id = self.source_table_model.data(
+                        self.source_table_model.index(selected_index.row(), 0))
+                    result, error = self.inventory_dao.delete(inventory_id)
+
+                    if not result:
+                        title = f"Cannot delete inventory item with id: {inventory_id}."
+                        error_message = f"One or more items could not be added to database: \n{error}"
+                        self.show_critical_message_box(title, error_message)
+                    self.update_source_model()
 
     @pyqtSlot(list)
     def store_rows_into_inventory(self, table_content_to_be_inserted):
-        print(f"before insert: {self.source_table_model.rowCount()}")
         for item in table_content_to_be_inserted:
             self.store_inventory_item_into_db(item)
 
+        self.update_source_model()
+
+    @pyqtSlot(int, Inventory)
+    def update_rows_in_inventory(self, inventory_id, inventory_item):
+        component_id, error = self.component_dao.get_component_id_or_insert(inventory_item.component)
+        if component_id != -1:
+            inventory_item.component_id = component_id
+            result, error = self.inventory_dao.update(inventory_id, inventory_item)
+        else:
+            result = False
+
+        if not result:
+            title = "Cannot update inventory item."
+            error_message = f"Item could not be updated: \n{error}"
+            self.show_critical_message_box(title, error_message)
+
+        self.update_source_model()
+
+    def store_inventory_item_into_db(self, inventory_item):
+        component_id, error = self.component_dao.get_component_id_or_insert(inventory_item.component)
+        if component_id != -1:
+            inventory_item.component_id = component_id
+            result, error = self.inventory_dao.insert(inventory_item)
+        else:
+            result = False
+
+        if not result:
+            title = "Cannot add inventory item into database."
+            error_message = f"One or more items could not be added to database: \n{error}"
+            self.show_critical_message_box(title, error_message)
+
+        return result, error
+
+    def update_source_model(self):
         self.source_table_model.setQuery(self.query)
-        print(f"after insert: {self.source_table_model.rowCount()}")
         self.source_table_model.dataChanged.emit(self.source_table_model.index(0, 0),
                                                  self.source_table_model.index(self.source_table_model.rowCount(),
                                                                                self.source_table_model.columnCount()),
                                                  [])
 
-    def store_inventory_item_into_db(self, inventory_item):
-        print("store_inventory_item_into_db")
-        component_id, error_message = self.component_dao.get_component_id_or_insert(inventory_item.component)
-        if component_id != -1:
-            inventory_item.component_id = component_id
-            result, error_message = self.inventory_dao.insert(inventory_item)
-        else:
-            result = False
-
-        if not result:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Icon.Critical)
-            msg.setText("Cannot add inventory item into database.")
-            msg.setInformativeText(
-                f"One or more items could not be added to database: \n{error_message}"
-            )
-            msg.setStandardButtons(
-                QMessageBox.StandardButton.Yes
-            )
-            msg.exec()
-
-        return result, error_message
+    @staticmethod
+    def show_critical_message_box(box_title, error_message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Icon.Critical)
+        msg.setText(box_title)
+        msg.setInformativeText(
+            error_message
+        )
+        msg.setStandardButtons(
+            QMessageBox.StandardButton.Ok
+        )
+        msg.exec()

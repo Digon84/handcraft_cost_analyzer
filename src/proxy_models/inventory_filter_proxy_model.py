@@ -21,9 +21,3 @@ class InventoryFilterProxyModel(QSortFilterProxyModel):
     def setSourceModel(self, source_model):
 
         super().setSourceModel(source_model)
-        self.sourceModel().dataChanged.connect(self.test_method)
-
-    def test_method(self, top, low):
-        print(f"data changed :) {top} {low}")
-
-
