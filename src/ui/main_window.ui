@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1530</width>
-    <height>777</height>
+    <height>859</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,16 +29,6 @@
         <string>Inventory</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="1">
-         <widget class="QPushButton" name="inventory_add_manually">
-          <property name="text">
-           <string>Add manually</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QTreeView" name="inventory_tree_view"/>
-        </item>
         <item row="0" column="4">
          <widget class="QPushButton" name="inventory_search">
           <property name="text">
@@ -56,12 +46,8 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="inventory_add_from_file">
-          <property name="text">
-           <string>Add from file</string>
-          </property>
-         </widget>
+        <item row="0" column="0" rowspan="2" colspan="2">
+         <widget class="QTreeView" name="inventory_tree_view"/>
         </item>
        </layout>
       </widget>
@@ -317,14 +303,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionadd"/>
-   <addaction name="actionprint"/>
+   <addaction name="action_add"/>
+   <addaction name="action_import_from_file"/>
+   <addaction name="action_export_to_file"/>
    <addaction name="separator"/>
-   <addaction name="actioncopy"/>
-   <addaction name="actionpaste"/>
+   <addaction name="action_print"/>
    <addaction name="separator"/>
+   <addaction name="action_copy"/>
+   <addaction name="action_paste"/>
   </widget>
-  <action name="actionadd">
+  <action name="action_add">
    <property name="icon">
     <iconset>
      <normaloff>../../assets/pictures/plus.png</normaloff>../../assets/pictures/plus.png</iconset>
@@ -333,10 +321,10 @@
     <string>add</string>
    </property>
    <property name="toolTip">
-    <string>add new item</string>
+    <string>Add new item</string>
    </property>
   </action>
-  <action name="actioncopy">
+  <action name="action_copy">
    <property name="icon">
     <iconset>
      <normaloff>../../assets/pictures/document-copy.png</normaloff>../../assets/pictures/document-copy.png</iconset>
@@ -345,13 +333,13 @@
     <string>copy</string>
    </property>
    <property name="toolTip">
-    <string>copy item</string>
+    <string>Copy item</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="actionprint">
+  <action name="action_print">
    <property name="icon">
     <iconset>
      <normaloff>../../assets/pictures/printer.png</normaloff>../../assets/pictures/printer.png</iconset>
@@ -359,8 +347,11 @@
    <property name="text">
     <string>print</string>
    </property>
+   <property name="toolTip">
+    <string>Print</string>
+   </property>
   </action>
-  <action name="actionpaste">
+  <action name="action_paste">
    <property name="icon">
     <iconset>
      <normaloff>../../assets/pictures/clipboard-paste-document-text.png</normaloff>../../assets/pictures/clipboard-paste-document-text.png</iconset>
@@ -368,31 +359,40 @@
    <property name="text">
     <string>paste</string>
    </property>
+   <property name="toolTip">
+    <string>Paste</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
    </property>
   </action>
+  <action name="action_import_from_file">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../assets/pictures/document--plus.png</normaloff>../../assets/pictures/document--plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>import_from_file</string>
+   </property>
+   <property name="toolTip">
+    <string>Import from file</string>
+   </property>
+  </action>
+  <action name="action_export_to_file">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../assets/pictures/document--arrow.png</normaloff>../../assets/pictures/document--arrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>export_to_file</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to file</string>
+   </property>
+  </action>
  </widget>
- <resources>
-  <include location="../../assets/pictures/plus_icon.qrc"/>
- </resources>
+ <resources/>
  <connections>
-  <connection>
-   <sender>inventory_add_manually</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>inventory_add_manually_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>227</x>
-     <y>80</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>329</x>
-     <y>-6</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>inventory_table_view</sender>
    <signal>doubleClicked(QModelIndex)</signal>
@@ -422,22 +422,6 @@
     <hint type="destinationlabel">
      <x>803</x>
      <y>-2</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>inventory_add_from_file</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>inventory_add_from_file_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>67</x>
-     <y>73</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>109</x>
-     <y>-7</y>
     </hint>
    </hints>
   </connection>

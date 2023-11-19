@@ -20,9 +20,9 @@ INVENTORY_TABLE_LAYOUT = (
     Column(column_name="finishing_effect"),
     Column(column_name="component_size"),
     Column(column_name="amount"),
-    Column(column_name="other", is_mandatory=False),
     Column(column_name="unit_price", is_mandatory=False, is_disabled=True),
     Column(column_name="total_price"),
+    Column(column_name="other", is_mandatory=False),
     Column(column_name="add_date", is_mandatory=False, is_disabled=True),
 )
 

@@ -6,8 +6,8 @@ from PyQt6.QtGui import QBrush, QColor, QColorConstants
 from PyQt6.QtSql import QSqlRelationalTableModel, QSqlQuery
 from PyQt6.QtWidgets import QDialog, QFileDialog, QTableWidget, QTableWidgetItem
 
-from src.parsers.shopping_summary_parser import ShoppingSummaryParser
-from src.parsers.file_parser import ParsedItem
+from src.file_operations.parsers.shopping_summary_parser import ShoppingSummaryParser
+from src.file_operations.parsers.file_parser import ParsedItem
 
 
 class AddFromFileInventoryWidget(QDialog):

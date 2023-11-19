@@ -4,9 +4,9 @@ import os
 import re
 from csv import DictReader
 
-from src.parsers.aliexpress_file_parser import AliexpressFileParser
-from src.parsers.allegro_file_parser import AllegroFileParser
-from src.parsers.file_parser import ParsedItem, Parsed
+from src.file_operations.parsers.aliexpress_file_parser import AliexpressFileParser
+from src.file_operations.parsers.allegro_file_parser import AllegroFileParser
+from src.file_operations.parsers.file_parser import ParsedItem, Parsed
 
 
 class ShoppingSummaryParser:
@@ -67,7 +67,7 @@ class ShoppingSummaryParser:
     @staticmethod
     def get_predefined_values():
         absolute_path = os.path.dirname(__file__)
-        relative_path = "../../assets/predefined/predefined_values.json"
+        relative_path = "../../../assets/predefined/predefined_values.json"
         full_path = os.path.join(absolute_path, relative_path)
         with open(full_path,
                   'r', encoding='utf-8') as f:

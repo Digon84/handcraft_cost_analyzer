@@ -1,6 +1,6 @@
 import re
 
-from src.parsers.file_parser import FileParser
+from src.file_operations.parsers.file_parser import FileParser
 
 
 class AliexpressFileParser(FileParser):

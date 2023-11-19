@@ -1,4 +1,4 @@
-from src.parsers.file_parser import FileParser, ParsedItem
+from src.file_operations.parsers.file_parser import FileParser
 import re
 
 
