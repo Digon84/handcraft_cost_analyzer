@@ -1,6 +1,3 @@
-import sys
-from typing import List
-
 from PyQt6 import QtWidgets as qtw
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
@@ -8,8 +5,8 @@ from PyQt6 import QtGui as qtg
 from src.entities.inventory import Inventory
 from src.database.dao.component_dao import ComponentDAO
 from src.database.dao.inventory_dao import InventoryDAO
-from src.parsers.file_parser import ParsedItem, Parsed, Row
-from src.parsers.shopping_summary_parser import ShoppingSummaryParser
+from src.file_operations.parsers.file_parser import Parsed, Row
+from src.file_operations.parsers.shopping_summary_parser import ShoppingSummaryParser
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 
 

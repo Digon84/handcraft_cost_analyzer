@@ -1,7 +1,7 @@
 from PyQt6 import uic
 
 from PyQt6.QtCore import Qt, pyqtSlot, pyqtSignal
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter, QFileDialog
 from PyQt6.QtSql import QSqlQueryModel
 
 from src.database.dao.component_dao import ComponentDAO
@@ -9,6 +9,7 @@ from src.database.dao.inventory_dao import InventoryDAO
 from src.database.inventory_handler import InventoryHandler
 from src.database.table_layouts import INVENTORY_TABLE_LAYOUT
 from src.entities.inventory import Inventory
+from src.file_operations.csv_exporter import write_content_to_csv
 from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
 from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
@@ -32,10 +33,20 @@ class MainWindow(QMainWindow):
         self.component_dao = ComponentDAO()
         self.inventory_dao = InventoryDAO()
         self.source_table_model = self._set_up_table_model()
+        self.columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i - 2 for i in
+                                range(self.source_table_model.columnCount()) if
+                                self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "component_id" and
+                                self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "inventory_id"}
         self.ui.inventory_line_edit.setCompleter(self._set_up_completer())
         self.proxy_model = InventoryFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.source_table_model)
         self.ui.inventory_table_view.setModel(self.proxy_model)
+        self.ui.action_add.triggered.connect(self.action_add_clicked)
+        self.ui.action_import_from_file.triggered.connect(self.action_add_from_file_clicked)
+        self.ui.action_copy.triggered.connect(self.copy_action_clicked)
+        self.ui.action_export_to_file.triggered.connect(self.action_export_clicked)
+        self.ui.action_paste.triggered.connect(self.action_paste_clicked)
+        self.ui.action_print.triggered.connect(self.action_print_clicked)
         for i, column in enumerate(INVENTORY_TABLE_LAYOUT):
             if column.is_hidden:
                 self.ui.inventory_table_view.hideColumn(i)
@@ -56,7 +67,7 @@ class MainWindow(QMainWindow):
         self.query = """SELECT inventory.inventory_id, component.component_id, component.material, component.type,
         component.made_off, component.shape, 
         component.color, component.finishing_effect, component.component_size, inventory.amount,
-                       inventory.other, inventory.unit_price, inventory.total_price, inventory.add_date
+                       inventory.unit_price, inventory.total_price, inventory.other, inventory.add_date
                        FROM inventory
                        INNER JOIN component ON inventory.component_id == component.component_id"""
         model.setQuery(self.query)
@@ -65,11 +76,7 @@ class MainWindow(QMainWindow):
 
     def inventory_add_from_file_clicked(self):
         # TODO: make unique column identification, not to hardcode, i-2 for skipping component_id
-        columns_mapping = {self.source_table_model.headerData(i, Qt.Orientation.Horizontal): i - 2 for i in
-                           range(self.source_table_model.columnCount()) if
-                           self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "component_id" and
-                           self.source_table_model.headerData(i, Qt.Orientation.Horizontal) != "inventory_id"}
-        self.inventory_add_from_file_window = LoadFromFileWidget(columns_mapping, self.source_table_model)
+        self.inventory_add_from_file_window = LoadFromFileWidget(self.columns_mapping, self.source_table_model)
         self.inventory_add_from_file_window.submitted.connect(self.store_rows_into_inventory)
         self.inventory_add_from_file_window.show()
 
@@ -171,3 +178,42 @@ class MainWindow(QMainWindow):
             QMessageBox.StandardButton.Ok
         )
         msg.exec()
+
+    def action_add_clicked(self):
+        self.inventory_add_manually_clicked()
+
+    def action_add_from_file_clicked(self):
+        self.inventory_add_from_file_clicked()
+
+    def copy_action_clicked(self):
+        print("copy_action_clicked")
+
+    def action_export_clicked(self):
+        # TODO: same code is used in load_from_file_widget. Create a module to have it written once? but ExistingFiles vs Existing file
+        file_dialog = QFileDialog()
+        (file_name, filters) = file_dialog.getSaveFileName(self, "Export file to csv", "")
+
+        data_to_write = self.get_data_for_export_to_csv()
+        if file_name:
+            write_content_to_csv(file_name, data_to_write)
+
+    def action_import_clicked(self):
+        print("action_import_clicked")
+
+    def action_paste_clicked(self):
+        print("action_paste_clicked")
+
+    def action_print_clicked(self):
+        print("action_print_clicked")
+
+    def get_data_for_export_to_csv(self):
+        data_to_export = []
+        for row_index in range(self.source_table_model.rowCount()):
+            row = {}
+            for column_index in range(self.source_table_model.columnCount()):
+                column_name = self.source_table_model.headerData(column_index, Qt.Orientation.Horizontal)
+                data = self.source_table_model.data(self.source_table_model.index(row_index, column_index))
+                if column_name != "inventory_id" and column_name != "component_id" and column_name != "add_date":
+                    row[column_name] = data
+            data_to_export.append(row)
+        return data_to_export
