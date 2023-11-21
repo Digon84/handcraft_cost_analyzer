@@ -3,10 +3,9 @@ import os
 from PyQt6 import uic
 
 from PyQt6.QtCore import Qt, pyqtSlot, pyqtSignal
-from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter, QFileDialog
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter, QFileDialog, QToolButton
 from PyQt6.QtSql import QSqlQueryModel
-from pyqt6_plugins.examplebutton import QtWidgets
-from pyqt6_plugins.examplebuttonplugin import QtGui
 
 from src.database.dao.component_dao import ComponentDAO
 from src.database.dao.inventory_dao import InventoryDAO
@@ -55,9 +54,9 @@ class MainWindow(QMainWindow):
         # set search line edit
         self.ui.inventory_line_edit.setPlaceholderText("Search...")
         self.ui.inventory_line_edit.setClearButtonEnabled(True)
-        clear_search_button = self.ui.inventory_line_edit.findChild(QtWidgets.QToolButton)
+        clear_search_button = self.ui.inventory_line_edit.findChild(QToolButton)
         clear_search_button.setIcon(
-            QtGui.QIcon(os.path.join(os.path.dirname(__file__), "../../assets/pictures/cross.png"))
+            QIcon(os.path.join(os.path.dirname(__file__), "../../assets/pictures/cross.png"))
         )
         clear_search_button.clicked.connect(self.inventory_search_clicked)
 
