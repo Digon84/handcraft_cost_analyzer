@@ -137,6 +137,15 @@ class LoadFromFileWidget(qtw.QWidget):
                 if clipboard_text:
                     for selected_index in self.table.selectedIndexes():
                         self.table.item(selected_index.row(), selected_index.column()).setText(clipboard_text)
+            elif event.key() == qtc.Qt.Key.Key_D:
+                selected_indexes = self.table.selectedIndexes()
+                if selected_indexes and len(selected_indexes) == 1:
+                    index = selected_indexes[-1]
+                    row = index.row()
+                    column = index.column()
+                    if row >= 1:
+                        data = self.table.item(row - 1, column).text()
+                        self.table.item(row, column).setText(data)
 
     def set_unit_price(self, item_changed: qtw.QTableWidgetItem):
         item_changed_row = item_changed.row()
