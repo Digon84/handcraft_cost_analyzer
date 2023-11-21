@@ -103,22 +103,23 @@ class MainWindow(QMainWindow):
                 msg.setIcon(QMessageBox.Icon.Question)
                 msg.setText("Delete item?")
                 msg.setInformativeText(
-                    "This operation will remove item from database. Do you want to continue?"
+                    "This operation will remove item(s) from database. Do you want to continue?"
                 )
                 msg.setStandardButtons(
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel
                 )
                 reply = msg.exec()
                 if reply == QMessageBox.StandardButton.Yes:
-                    selected_index = self.ui.inventory_table_view.selectedIndexes()[0]
-                    inventory_id = self.source_table_model.data(
-                        self.source_table_model.index(selected_index.row(), 0))
-                    result, error = self.inventory_dao.delete(inventory_id)
+                    selected_indexes = self.ui.inventory_table_view.selectedIndexes()
+                    for selected_index in selected_indexes:
+                        inventory_id = self.source_table_model.data(
+                            self.source_table_model.index(selected_index.row(), 0))
+                        result, error = self.inventory_dao.delete(inventory_id)
 
-                    if not result:
-                        title = f"Cannot delete inventory item with id: {inventory_id}."
-                        error_message = f"One or more items could not be added to database: \n{error}"
-                        self.show_critical_message_box(title, error_message)
+                        if not result:
+                            title = f"Cannot delete inventory item with id: {inventory_id}."
+                            error_message = f"One or more items could not be added to database: \n{error}"
+                            self.show_critical_message_box(title, error_message)
                     self.update_source_model()
 
     @pyqtSlot(list)
