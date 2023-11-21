@@ -1,8 +1,12 @@
+import os
+
 from PyQt6 import uic
 
 from PyQt6.QtCore import Qt, pyqtSlot, pyqtSignal
 from PyQt6.QtWidgets import QMainWindow, QMessageBox, QCompleter, QFileDialog
 from PyQt6.QtSql import QSqlQueryModel
+from pyqt6_plugins.examplebutton import QtWidgets
+from pyqt6_plugins.examplebuttonplugin import QtGui
 
 from src.database.dao.component_dao import ComponentDAO
 from src.database.dao.inventory_dao import InventoryDAO
@@ -47,6 +51,16 @@ class MainWindow(QMainWindow):
         self.ui.action_export_to_file.triggered.connect(self.action_export_clicked)
         self.ui.action_paste.triggered.connect(self.action_paste_clicked)
         self.ui.action_print.triggered.connect(self.action_print_clicked)
+
+        # set search line edit
+        self.ui.inventory_line_edit.setPlaceholderText("Search...")
+        self.ui.inventory_line_edit.setClearButtonEnabled(True)
+        clear_search_button = self.ui.inventory_line_edit.findChild(QtWidgets.QToolButton)
+        clear_search_button.setIcon(
+            QtGui.QIcon(os.path.join(os.path.dirname(__file__), "../../assets/pictures/cross.png"))
+        )
+        clear_search_button.clicked.connect(self.inventory_search_clicked)
+
         for i, column in enumerate(INVENTORY_TABLE_LAYOUT):
             if column.is_hidden:
                 self.ui.inventory_table_view.hideColumn(i)

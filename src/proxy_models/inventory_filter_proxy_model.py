@@ -8,7 +8,7 @@ class InventoryFilterProxyModel(QSortFilterProxyModel):
 
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex) -> bool:
         if self.filter != "":
-            filter_elements = self.filter.split(" ")
+            filter_elements = self.filter.strip().split(" ")
             matched_elements = 0
             elements = []
             # TODO: skip columns with indexes, make it easier to maintain
