@@ -151,13 +151,13 @@ class LoadFromFileWidget(qtw.QWidget):
         item_changed_row = item_changed.row()
         item_changed_column = item_changed.column()
 
-        if item_changed_column == 10 or item_changed_column == 8:
+        if item_changed_column == 9 or item_changed_column == 7:
             # TODO: fix hardcodes
-            total_price = self.table.item(item_changed_row, 10).text() if self.table.item(item_changed_row, 10) else ""
-            amount = self.table.item(item_changed_row, 8).text() if self.table.item(item_changed_row, 8) else ""
+            total_price = self.table.item(item_changed_row, 9).text() if self.table.item(item_changed_row, 9) else ""
+            amount = self.table.item(item_changed_row, 7).text() if self.table.item(item_changed_row, 7) else ""
 
             if total_price and amount:
-                unit_price_item = self.table.item(item_changed_row, 9)
+                unit_price_item = self.table.item(item_changed_row, 8)
                 unit_price_item.setText(str(round(float(total_price) / float(amount), 3)))
 
 
