@@ -90,7 +90,22 @@ class LoadFromFileWidget(qtw.QWidget):
                 table_item.setFlags(flags)
 
             table_widget.setItem(next_item, column_number, table_item)
+
         return table_widget.rowCount()-1
+
+    def add_parsing_result_row(self, hint):
+        table_widget: qtw.QTableWidget = self.table
+        table_widget.insertRow(table_widget.rowCount())
+        next_item = table_widget.rowCount() - 1
+
+        table_widget.setSpan(next_item, 0, 1, table_widget.columnCount())
+        parsing_row = qtw.QTableWidgetItem(hint)
+        parsing_row.setFlags(parsing_row.flags() & ~qtc.Qt.ItemFlag.ItemIsEnabled)
+        table_widget.setItem(next_item, 0, parsing_row)
+
+        table_widget.resizeRowsToContents()
+
+        return table_widget.rowCount()
 
     def cell_content_changed(self, row, column):
         if not self.first_table_fill:
@@ -108,10 +123,8 @@ class LoadFromFileWidget(qtw.QWidget):
             for file in filenames:
                 parsed_items.extend(self.shopping_summary_parser.parse_file(file))
         for row in parsed_items:
-            row_index = self.add_row(row)
-            item = self.table.item(row_index, 0)
-            if item:
-                item.setToolTip(row.hint)
+            self.add_parsing_result_row(row.hint)
+            _ = self.add_row(row)
 
         completer = TableItemCompleter(self.source_table_model)
         for column in self.columns_mapping.values():
@@ -121,7 +134,7 @@ class LoadFromFileWidget(qtw.QWidget):
 
     def on_submit(self):
         table_content = []
-        for i in range(self.table.rowCount()):
+        for i in range(1, self.table.rowCount(), 2):
             row = {}
             for j in range(self.table.columnCount()):
                 row[self.table.horizontalHeaderItem(j).text()] = self.table.item(i, j).text()
@@ -143,9 +156,35 @@ class LoadFromFileWidget(qtw.QWidget):
                     index = selected_indexes[-1]
                     row = index.row()
                     column = index.column()
-                    if row >= 1:
-                        data = self.table.item(row - 1, column).text()
+                    if row >= 2:
+                        data = self.table.item(row - 2, column).text()
                         self.table.item(row, column).setText(data)
+        # if event.key() == qtc.Qt.Key.Key_Up:
+        #     selected_indexes = self.table.selectedIndexes()
+        #     if selected_indexes and len(selected_indexes) == 1:
+        #         index = selected_indexes[-1]
+        #         row = index.row()
+        #         column = index.column()
+        #         item_currently_selected = self.table.item(row, column)
+        #         item = self.table.item(row - 2, column)
+        #         if item:
+        #             item.setSelected(True)
+        #             self.table.scrollToItem(item)
+        #             if item_currently_selected:
+        #                 item_currently_selected.setSelected(False)
+        # elif event.key() == qtc.Qt.Key.Key_Down:
+        #     selected_indexes = self.table.selectedIndexes()
+        #     if selected_indexes and len(selected_indexes) == 1:
+        #         index = selected_indexes[-1]
+        #         row = index.row()
+        #         column = index.column()
+        #         item_currently_selected = self.table.item(row, column)
+        #         item = self.table.item(row + 2, column)
+        #         if item:
+        #             item.setSelected(True)
+        #             self.table.scrollToItem(item)
+        #             if item_currently_selected:
+        #                 item_currently_selected.setSelected(False)
 
     def set_unit_price(self, item_changed: qtw.QTableWidgetItem):
         item_changed_row = item_changed.row()
