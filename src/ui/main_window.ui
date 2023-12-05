@@ -278,6 +278,63 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="summary">
+       <attribute name="icon">
+        <iconset>
+         <normaloff>../../assets/pictures/sum.png</normaloff>../../assets/pictures/sum.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Summary</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="summary_total_spend">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Total spend:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="2">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -416,8 +473,8 @@
    <slot>inventory_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>434</x>
-     <y>71</y>
+     <x>666</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>803</x>
@@ -432,12 +489,28 @@
    <slot>inventory_search_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1248</x>
-     <y>82</y>
+     <x>1507</x>
+     <y>122</y>
     </hint>
     <hint type="destinationlabel">
      <x>1217</x>
      <y>-16</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>inventory_tab_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>257</x>
+     <y>-11</y>
     </hint>
    </hints>
   </connection>
@@ -447,5 +520,6 @@
   <slot>inventory_add_manually()</slot>
   <slot>inventory_search_clicked()</slot>
   <slot>inventory_edit_item()</slot>
+  <slot>inventory_tab_changed()</slot>
  </slots>
 </ui>

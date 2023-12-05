@@ -51,3 +51,14 @@ class InventoryDAO:
 
         result = query.exec()
         return result, query.lastError().text()
+
+    def get_total_spend(self):
+        query = QSqlQuery()
+        query.prepare("SELECT SUM(total_price) FROM inventory")
+
+        result = query.exec()
+        if result:
+            query.next()
+            return query.value(0), ""
+        else:
+            return result, query.lastError().text()

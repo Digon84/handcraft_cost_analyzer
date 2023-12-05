@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.inventory_line_edit.setCompleter(self._set_up_completer())
         self.proxy_model = InventoryFilterProxyModel(self)
         self.proxy_model.setSourceModel(self.source_table_model)
+
         self.ui.inventory_table_view.setModel(self.proxy_model)
         self.ui.action_add.triggered.connect(self.action_add_clicked)
         self.ui.action_import_from_file.triggered.connect(self.action_add_from_file_clicked)
@@ -108,6 +109,11 @@ class MainWindow(QMainWindow):
     def inventory_search_clicked(self):
         self.proxy_model.filter = self.ui.inventory_line_edit.text()
         self.proxy_model.invalidateFilter()
+
+    def inventory_tab_changed(self):
+        if self.ui.tabWidget.currentIndex() == 2:
+            summary, error = self.inventory_dao.get_total_spend()
+            self.ui.summary_total_spend.setText(str(summary))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Delete:
