@@ -159,32 +159,25 @@ class LoadFromFileWidget(qtw.QWidget):
                     if row >= 2:
                         data = self.table.item(row - 2, column).text()
                         self.table.item(row, column).setText(data)
-        # if event.key() == qtc.Qt.Key.Key_Up:
-        #     selected_indexes = self.table.selectedIndexes()
-        #     if selected_indexes and len(selected_indexes) == 1:
-        #         index = selected_indexes[-1]
-        #         row = index.row()
-        #         column = index.column()
-        #         item_currently_selected = self.table.item(row, column)
-        #         item = self.table.item(row - 2, column)
-        #         if item:
-        #             item.setSelected(True)
-        #             self.table.scrollToItem(item)
-        #             if item_currently_selected:
-        #                 item_currently_selected.setSelected(False)
-        # elif event.key() == qtc.Qt.Key.Key_Down:
-        #     selected_indexes = self.table.selectedIndexes()
-        #     if selected_indexes and len(selected_indexes) == 1:
-        #         index = selected_indexes[-1]
-        #         row = index.row()
-        #         column = index.column()
-        #         item_currently_selected = self.table.item(row, column)
-        #         item = self.table.item(row + 2, column)
-        #         if item:
-        #             item.setSelected(True)
-        #             self.table.scrollToItem(item)
-        #             if item_currently_selected:
-        #                 item_currently_selected.setSelected(False)
+        if event.key() == qtc.Qt.Key.Key_Up:
+            selected_indexes = self.table.selectedIndexes()
+            if selected_indexes and len(selected_indexes) == 1:
+                index = selected_indexes[-1]
+                row = index.row()
+                column = index.column()
+                if row - 2 >= 0:
+                    self.table.setCurrentCell(row - 2, column)
+                else:
+                    self.table.scrollToItem(self.table.item(0, 0))
+
+        elif event.key() == qtc.Qt.Key.Key_Down:
+            selected_indexes = self.table.selectedIndexes()
+            if selected_indexes and len(selected_indexes) == 1:
+                index = selected_indexes[-1]
+                row = index.row()
+                column = index.column()
+                if row + 2 <= self.table.rowCount():
+                    self.table.setCurrentCell(row + 2, column)
 
     def set_unit_price(self, item_changed: qtw.QTableWidgetItem):
         item_changed_row = item_changed.row()
