@@ -185,6 +185,7 @@ class MainWindow(QMainWindow):
                                                  self.source_table_model.index(self.source_table_model.rowCount(),
                                                                                self.source_table_model.columnCount()),
                                                  [])
+        self.ui.inventory_table_view.scrollToBottom()
 
     @staticmethod
     def show_critical_message_box(box_title, error_message):
