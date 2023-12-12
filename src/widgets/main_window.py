@@ -19,6 +19,7 @@ from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
 from src.database.sqlite_connector import SqliteConnector
 from src.widgets.inventory.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.inventory.edit_inventory_item_widget import InventoryEditItem
+from src.widgets.inventory.inventory_widget import InventoryWidget
 from src.widgets.inventory.load_from_file_widget import LoadFromFileWidget
 
 
@@ -51,6 +52,8 @@ class MainWindow(QMainWindow):
         self.ui.action_export_to_file.triggered.connect(self.action_export_clicked)
         self.ui.action_paste.triggered.connect(self.action_paste_clicked)
         self.ui.action_print.triggered.connect(self.action_print_clicked)
+
+        self.ui.tabWidget.addTab(InventoryWidget(), "Inventory new")
 
         # set search line edit
         self.ui.inventory_line_edit.setPlaceholderText("Search...")
