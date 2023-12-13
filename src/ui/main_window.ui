@@ -20,37 +20,6 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="inventory">
-       <attribute name="icon">
-        <iconset>
-         <normaloff>../../assets/pictures/clipboard-list.png</normaloff>../../assets/pictures/clipboard-list.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Inventory</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="4">
-         <widget class="QPushButton" name="inventory_search">
-          <property name="text">
-           <string>Search</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLineEdit" name="inventory_line_edit"/>
-        </item>
-        <item row="1" column="3" colspan="2">
-         <widget class="QTableView" name="inventory_table_view">
-          <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" rowspan="2" colspan="2">
-         <widget class="QTreeView" name="inventory_tree_view"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="products">
        <attribute name="icon">
         <iconset>
@@ -450,54 +419,6 @@
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>inventory_table_view</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>inventory_edit_item()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>518</x>
-     <y>316</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>656</x>
-     <y>-3</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>inventory_line_edit</sender>
-   <signal>returnPressed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>inventory_search_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>666</x>
-     <y>121</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>803</x>
-     <y>-2</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>inventory_search</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>inventory_search_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1507</x>
-     <y>122</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1217</x>
-     <y>-16</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>tabWidget</sender>
    <signal>currentChanged(int)</signal>

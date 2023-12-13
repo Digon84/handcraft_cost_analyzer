@@ -11,18 +11,24 @@ from src.database.dao.component_dao import ComponentDAO
 from src.database.dao.inventory_dao import InventoryDAO
 from src.database.table_layouts import INVENTORY_TABLE_LAYOUT
 from src.entities.inventory import Inventory
+from src.file_operations.csv_exporter import write_content_to_csv
 from src.proxy_models.inventory_filter_proxy_model import InventoryFilterProxyModel
 from src.proxy_models.one_column_table_proxy_model import OneColumnTableProxyModel
 from src.proxy_models.unique_items_proxy_model import UniqueItemsProxyModel
+from src.widgets.inventory.add_new_item_manually_widget import AddNewItemManuallyWidget
 from src.widgets.inventory.edit_inventory_item_widget import InventoryEditItem
+from src.widgets.inventory.load_from_file_widget import LoadFromFileWidget
 
 
 class InventoryWidget(qtw.QWidget):
+    add_new_item_manually = qtc.pyqtSignal(list)
+    add_items_from_file = qtc.pyqtSignal(list)
+
     def __init__(self):
         super().__init__()
         self.table_view = qtw.QTableView()
         self.source_table_model, self.filter_proxy_model = self.set_table_models()
-        self.column_mapping = self.get_columns_mapping()
+        self.columns_mapping = self.get_columns_mapping()
         self.hide_columns()
         self.search_text_field = self.get_search_text_field()
         self.search_button = qtw.QPushButton("Search")
@@ -30,14 +36,11 @@ class InventoryWidget(qtw.QWidget):
         self.component_dao = ComponentDAO()
         self.inventory_dao = InventoryDAO()
 
-
         self.set_layouts()
 
         self.search_button.clicked.connect(self.search_clicked)
         self.search_text_field.returnPressed.connect(self.search_clicked)
         self.table_view.doubleClicked.connect(self.inventory_edit_item)
-
-
 
     def set_table_models(self):
         source_table_model = self._set_up_table_model()
@@ -91,6 +94,17 @@ class InventoryWidget(qtw.QWidget):
         self.inventory_edit = InventoryEditItem(self.source_table_model, source_index)
         self.inventory_edit.submitted.connect(self.update_rows_in_inventory)
         self.inventory_edit.show()
+
+    def inventory_add_item(self):
+        self.add_new_item = AddNewItemManuallyWidget(self.source_table_model)
+        self.add_new_item.submitted.connect(self.store_rows_into_inventory)
+        self.add_new_item.show()
+
+    def inventory_add_items_from_file(self):
+        # TODO: make unique column identification, not to hardcode, i-2 for skipping component_id
+        self.inventory_add_from_file_window = LoadFromFileWidget(self.columns_mapping, self.source_table_model)
+        self.inventory_add_from_file_window.submitted.connect(self.store_rows_into_inventory)
+        self.inventory_add_from_file_window.show()
 
     def keyPressEvent(self, event):
         if event.key() == qtc.Qt.Key.Key_Delete:
@@ -176,6 +190,27 @@ class InventoryWidget(qtw.QWidget):
             qtw.QMessageBox.StandardButton.Ok
         )
         msg.exec()
+
+    def export_data_to_csv(self):
+        # TODO: same code is used in load_from_file_widget. Create a module to have it written once? but ExistingFiles vs Existing file
+        file_dialog = qtw.QFileDialog()
+        (file_name, filters) = file_dialog.getSaveFileName(self, "Export file to csv", "")
+
+        data_to_write = self.get_data_for_export_to_csv()
+        if file_name:
+            write_content_to_csv(file_name, data_to_write)
+
+    def get_data_for_export_to_csv(self):
+        data_to_export = []
+        for row_index in range(self.source_table_model.rowCount()):
+            row = {}
+            for column_index in range(self.source_table_model.columnCount()):
+                column_name = self.source_table_model.headerData(column_index, qtc.Qt.Orientation.Horizontal)
+                data = self.source_table_model.data(self.source_table_model.index(row_index, column_index))
+                if column_name != "inventory_id" and column_name != "component_id" and column_name != "add_date":
+                    row[column_name] = data
+            data_to_export.append(row)
+        return data_to_export
 
     def _set_up_completer(self):
         completer_proxy_model = UniqueItemsProxyModel(self)
