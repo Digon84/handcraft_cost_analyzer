@@ -24,7 +24,6 @@ class ProductDetailsWidget(qtw.QWidget):
         self.amount_line_edit = self.get_amount_line_edit()
         self.set_layouts()
         # end of code
-        self.show()
 
     @staticmethod
     def get_price_for_piece_label():

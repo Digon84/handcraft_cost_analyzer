@@ -17,7 +17,6 @@ class ProductsWidget(qtw.QWidget):
         self.product_details_widget = ProductDetailsWidget()
         self.set_layout()
         # end of code
-        self.show()
 
     def set_layout(self):
         products_widget_layout = qtw.QHBoxLayout()

@@ -19,7 +19,6 @@ class ProductsListWidget(qtw.QWidget):
         self.set_layouts()
 
         # end of code
-        self.show()
 
     def set_layouts(self):
         product_list_layout = qtw.QVBoxLayout()

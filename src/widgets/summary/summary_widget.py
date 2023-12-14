@@ -14,7 +14,6 @@ class SummaryWidget(qtw.QWidget):
 
         self.set_layouts()
         # end of code
-        self.show()
 
     def set_layouts(self):
         h_box_layout = qtw.QHBoxLayout()
@@ -24,8 +23,10 @@ class SummaryWidget(qtw.QWidget):
         h_box_layout.setAlignment(qtc.Qt.AlignmentFlag.AlignTop | qtc.Qt.AlignmentFlag.AlignLeft)
         h_box_layout.addStretch()
 
-
         self.setLayout(h_box_layout)
+
+    def set_total_spend(self, value: float):
+        self.total_spend_line_edit.setText(str(value))
 
     @staticmethod
     def get_total_spend_label():
