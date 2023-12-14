@@ -12,17 +12,18 @@ class ProductsListWidget(qtw.QWidget):
         # code here
         self.setMaximumWidth(350)
 
+        self.search_label = self.get_search_label()
+        self.search_line_edit = self.get_search_line_edit()
+        self.products_list_view = self.get_product_list_view()
+
+        self.set_layouts()
+
+        # end of code
+        self.show()
+
+    def set_layouts(self):
         product_list_layout = qtw.QVBoxLayout()
         search_layout = qtw.QHBoxLayout()
-        self.search_label = qtw.QLabel()
-        print(ProductsListWidget.get_image_path("magnifier.png"))
-        self.search_label.setPixmap(qtg.QPixmap(ProductsListWidget.get_image_path("magnifier.png")))
-
-        self.search_line_edit = qtw.QLineEdit()
-
-        self.search_line_edit.setPlaceholderText("Search...")
-
-        self.products_list_view = qtw.QTreeView()
 
         search_layout.addWidget(self.search_line_edit)
         search_layout.addWidget(self.search_label)
@@ -31,8 +32,22 @@ class ProductsListWidget(qtw.QWidget):
         product_list_layout.addWidget(self.products_list_view)
 
         self.setLayout(product_list_layout)
-        # end of code
-        self.show()
+
+    @staticmethod
+    def get_search_label():
+        search_label = qtw.QLabel()
+        search_label.setPixmap(qtg.QPixmap(ProductsListWidget.get_image_path("magnifier.png")))
+        return search_label
+
+    @staticmethod
+    def get_search_line_edit():
+        search_line_edit = qtw.QLineEdit()
+        search_line_edit.setPlaceholderText("Search...")
+        return search_line_edit
+
+    @staticmethod
+    def get_product_list_view():
+        return qtw.QTreeView()
 
     @staticmethod
     def get_image_path(image_file_name):
