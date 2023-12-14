@@ -22,6 +22,7 @@ from src.widgets.inventory.edit_inventory_item_widget import InventoryEditItem
 from src.widgets.inventory.inventory_widget import InventoryWidget
 from src.widgets.inventory.load_from_file_widget import LoadFromFileWidget
 from src.widgets.products.products_widget import ProductsWidget
+from src.widgets.summary.summary_widget import SummaryWidget
 
 
 class MainWindow(QMainWindow):
@@ -46,8 +47,10 @@ class MainWindow(QMainWindow):
         self.ui.action_print.triggered.connect(self.action_print_clicked)
         self.inventory_widget = InventoryWidget()
         self.products_widget = ProductsWidget()
+        self.summary_widget = SummaryWidget()
         self.ui.tabWidget.addTab(self.inventory_widget, "Inventory new")
         self.ui.tabWidget.addTab(self.products_widget, "Products new")
+        self.ui.tabWidget.addTab(self.summary_widget, "Summary new")
 
         self.show()
 
