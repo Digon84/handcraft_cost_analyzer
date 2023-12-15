@@ -58,6 +58,7 @@ class MainWindow(qtw.QMainWindow):
     def set_layout(self):
         self.setCentralWidget(self.tab_widget)
 
+    # inventory functions
     def inventory_import_items_from_file(self):
         self.inventory_widget.inventory_add_items_from_file()
 
@@ -74,29 +75,74 @@ class MainWindow(qtw.QMainWindow):
             summary, error = self.inventory_dao.get_total_spend()
             self.summary_widget.set_total_spend(summary)
 
-    def inventory_add_item_action_triggered(self):
-        self.inventory_add_item_manually()
+    # projects functions
+    def products_add_product(self):
+        print("Add product")
 
+    # common actions triggered
+    def add_item_action_triggered(self):
+        if self.tab_widget.currentIndex() == TabIndexes.Inventory:
+            self.inventory_add_item_manually()
+        elif self.tab_widget.currentIndex() == TabIndexes.Products:
+            self.products_add_product()
+
+    def save_action_triggered(self):
+        print("save_action_triggered")
+
+    def copy_item_action_triggered(self):
+        print("products_copy_product_action_triggered")
+
+    def paste_item_action_triggered(self):
+        print("products_paste_product_action_triggered")
+
+    def print_action_triggered(self):
+        print("print_action_triggered")
+
+    # inventory actions triggered
     def inventory_import_items_from_file_action_triggered(self):
         self.inventory_import_items_from_file()
 
     def inventory_export_to_csv_action_triggered(self):
         self.inventory_widget.export_data_to_csv()
 
-    def print_action_triggered(self):
-        print("print_action_triggered")
-
     def _create_actions(self):
+        self._create_common_actions()
         self._create_inventory_actions()
-        self._create_print_actions()
+
+    def _create_common_actions(self):
+        self.add_item_action = qtg.QAction(self)
+        self.add_item_action.setText("&add_item_action")
+        self.add_item_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("plus.png"))))
+        self.add_item_action.setToolTip("Add new item to inventory")
+        self.add_item_action.triggered.connect(self.add_item_action_triggered)
+
+        self.save_action = qtg.QAction(self)
+        self.save_action.setText("&save_action")
+        self.save_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("disk-black.png"))))
+        self.save_action.setDisabled(True)
+        self.save_action.setToolTip("Save")
+        self.save_action.triggered.connect(self.save_action_triggered)
+
+        self.copy_item_action = qtg.QAction(self)
+        self.copy_item_action.setText("&copy_item_action")
+        self.copy_item_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("document-copy.png"))))
+        self.copy_item_action.setToolTip("Copy selected item")
+        self.copy_item_action.triggered.connect(self.copy_item_action_triggered)
+
+        self.paste_item_action = qtg.QAction(self)
+        self.paste_item_action.setText("&paste_item_action")
+        self.paste_item_action.setIcon(
+            qtg.QIcon(qtg.QPixmap(self.get_image_path("clipboard-paste-document-text.png"))))
+        self.paste_item_action.setToolTip("Paste selected item")
+        self.paste_item_action.triggered.connect(self.paste_item_action_triggered)
+
+        self.print_action = qtg.QAction(self)
+        self.print_action.setText("&print_action")
+        self.print_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("printer.png"))))
+        self.print_action.setToolTip("Print current tab")
+        self.print_action.triggered.connect(self.print_action_triggered)
 
     def _create_inventory_actions(self):
-        self.inventory_add_item_action = qtg.QAction(self)
-        self.inventory_add_item_action.setText("&inventory_add_item_action")
-        self.inventory_add_item_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("plus.png"))))
-        self.inventory_add_item_action.setToolTip("Add new inventory item")
-        self.inventory_add_item_action.triggered.connect(self.inventory_add_item_action_triggered)
-
         self.inventory_import_items_from_file_action = qtg.QAction(self)
         self.inventory_import_items_from_file_action.setText("&inventory_import_items_from_file_action")
         self.inventory_import_items_from_file_action.setIcon(qtg.QIcon(
@@ -110,24 +156,21 @@ class MainWindow(qtw.QMainWindow):
         self.inventory_export_to_csv_action.setToolTip("Export inventory content to csv file")
         self.inventory_export_to_csv_action.triggered.connect(self.inventory_export_to_csv_action_triggered)
 
-    def _create_print_actions(self):
-        self.print_action = qtg.QAction(self)
-        self.print_action.setText("&add_inventory_item_action")
-        self.print_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("printer.png"))))
-        self.print_action.setToolTip("Add new inventory item")
-        self.print_action.triggered.connect(self.print_action_triggered)
-
     def _create_tool_bars(self):
         tool_bars = {}
+
+        common_tool_bar = self.addToolBar("common_tool_bar")
+        common_tool_bar.addAction(self.add_item_action)
+        common_tool_bar.addAction(self.save_action)
+        common_tool_bar.addAction(self.copy_item_action)
+        common_tool_bar.addAction(self.paste_item_action)
+        common_tool_bar.addAction(self.print_action)
+        tool_bars["common_tool_bar"] = common_tool_bar
+
         inventory_tool_bar = self.addToolBar("inventory_tool_bar")
-        inventory_tool_bar.addAction(self.inventory_add_item_action)
         inventory_tool_bar.addAction(self.inventory_import_items_from_file_action)
         inventory_tool_bar.addAction(self.inventory_export_to_csv_action)
         tool_bars["inventory_tool_bar"] = inventory_tool_bar
-
-        print_tool_bar = self.addToolBar("print_tool_bar")
-        print_tool_bar.addAction(self.print_action)
-        tool_bars["print_tool_bar"] = print_tool_bar
 
         return tool_bars
 
