@@ -8,5 +8,6 @@ os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"
 app = QApplication(sys.argv)
 
 window = MainWindow()
+window.show()
 
 app.exec()
