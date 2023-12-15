@@ -3,6 +3,9 @@ import sys
 from PyQt6 import QtWidgets as qtw
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
+from PyQt6 import QtSql as qsql
+
+from src.database.dao.product_dao import ProductDAO
 
 
 class ProductsListWidget(qtw.QWidget):
@@ -12,9 +15,10 @@ class ProductsListWidget(qtw.QWidget):
         # code here
         self.setMaximumWidth(350)
 
+        self.product_dao = ProductDAO()
         self.search_label = self.get_search_label()
         self.search_line_edit = self.get_search_line_edit()
-        self.products_list_view = self.get_product_list_view()
+        self.products_list_widget = self.get_product_list_widget()
 
         self.set_layouts()
 
@@ -28,7 +32,7 @@ class ProductsListWidget(qtw.QWidget):
         search_layout.addWidget(self.search_label)
 
         product_list_layout.addLayout(search_layout)
-        product_list_layout.addWidget(self.products_list_view)
+        product_list_layout.addWidget(self.products_list_widget)
 
         self.setLayout(product_list_layout)
 
@@ -44,9 +48,23 @@ class ProductsListWidget(qtw.QWidget):
         search_line_edit.setPlaceholderText("Search...")
         return search_line_edit
 
-    @staticmethod
-    def get_product_list_view():
-        return qtw.QTreeView()
+    def get_product_list_widget(self):
+        tree_widget = qtw.QTreeWidget()
+        products, _ = self.product_dao.get_product_names()
+        tree_widget.setHeaderHidden(True)
+
+        for index, product in enumerate(products):
+            item = qtw.QTreeWidgetItem()
+            item.setText(0, product)
+            tree_widget.insertTopLevelItem(index, item)
+
+        tree_widget.currentItemChanged.connect(self.load_currently_selected_item_data)
+
+        return tree_widget
+
+    def load_currently_selected_item_data(self, current: qtw.QTreeWidgetItem, previous: qtw.QTreeWidgetItem):
+        print("load_currently_selected_item_data")
+        print(f"Current item: {current.text(0)}")
 
     @staticmethod
     def get_image_path(image_file_name):
