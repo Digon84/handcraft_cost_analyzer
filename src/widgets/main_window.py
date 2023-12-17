@@ -29,7 +29,7 @@ class MainWindow(qtw.QMainWindow):
         self.setGeometry(100, 100, 1500, 800)
 
         self.db_connector = InventoryHandler(database_connector=SqliteConnector)
-
+        self.product_changed = False
         self.inventory_dao = InventoryDAO()
         self.inventory_widget = InventoryWidget()
         self.products_widget = ProductsWidget()
@@ -78,6 +78,8 @@ class MainWindow(qtw.QMainWindow):
     # projects functions
     def products_add_product(self):
         print("Add product")
+        self.products_widget.add_product("New product")
+        self.save_action.setDisabled(False)
 
     # common actions triggered
     def add_item_action_triggered(self):
@@ -119,7 +121,7 @@ class MainWindow(qtw.QMainWindow):
         self.save_action = qtg.QAction(self)
         self.save_action.setText("&save_action")
         self.save_action.setIcon(qtg.QIcon(qtg.QPixmap(self.get_image_path("disk-black.png"))))
-        self.save_action.setDisabled(True)
+        self.save_action.setDisabled(False) if self.product_changed else self.save_action.setDisabled(True)
         self.save_action.setToolTip("Save")
         self.save_action.triggered.connect(self.save_action_triggered)
 

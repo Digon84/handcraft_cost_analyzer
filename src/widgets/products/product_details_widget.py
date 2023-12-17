@@ -4,12 +4,16 @@ from PyQt6 import QtWidgets as qtw
 from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
 
+from src.database.dao.products_dao import ProductsDAO
+from src.entities.product import Product
+
 
 class ProductDetailsWidget(qtw.QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # code here
+        self.product_dao = ProductsDAO()
         self.picture_placeholders = self.get_picture_placeholders()
         self.components_summary_table = self.get_components_summary_table()
         self.comments_field = self.get_comments_field()
@@ -69,9 +73,40 @@ class ProductDetailsWidget(qtw.QWidget):
 
         self.setLayout(project_details_layout)
 
+    def load_details_for_current_item(self, product_name: str):
+        print(f"product_details_widget load_details_for_current_item: {product_name}")
+        product, error = self.product_dao.get_product_by_name(product_name)
+        self.load_pictures(product)
+        self.load_components_summary_table()
+
+    def load_pictures(self, product):
+        if product.picture_1:
+            self.picture_placeholders[0].setPixmap(qtg.QPixmap(product.picture_1))
+            self.picture_placeholders[0].setScaledContents(True)
+            self.picture_placeholders[0].setSizePolicy(qtw.QSizePolicy.Policy.Ignored, qtw.QSizePolicy.Policy.Ignored)
+        if product.picture_2:
+            self.picture_placeholders[1].setPixmap(qtg.QPixmap(product.picture_2))
+            self.picture_placeholders[1].setScaledContents(True)
+            self.picture_placeholders[1].setSizePolicy(qtw.QSizePolicy.Policy.Ignored, qtw.QSizePolicy.Policy.Ignored)
+        if product.picture_3:
+            self.picture_placeholders[2].setPixmap(qtg.QPixmap(product.picture_3))
+            self.picture_placeholders[2].setScaledContents(True)
+            self.picture_placeholders[2].setSizePolicy(qtw.QSizePolicy.Policy.Ignored, qtw.QSizePolicy.Policy.Ignored)
+
+    def load_components_summary_table(self):
+        pass
+
+    def clear_content(self):
+        for i in range(3):
+            self.picture_placeholders[i].setPixmap(qtg.QPixmap(ProductDetailsWidget.get_image_path("plus.png")))
+            self.picture_placeholders[i].setScaledContents(False)
+            self.picture_placeholders[i].setAlignment(qtc.Qt.AlignmentFlag.AlignCenter)
+
+
     @staticmethod
     def get_components_summary_table():
-        return qtw.QTableView()
+        table_widget = qtw.QTableWidget()
+        return table_widget
 
     @staticmethod
     def get_comments_field():
@@ -81,7 +116,7 @@ class ProductDetailsWidget(qtw.QWidget):
 
     @staticmethod
     def get_additional_table():
-        return qtw.QTableView()
+        return qtw.QTableWidget()
 
     @staticmethod
     def get_price_for_piece_value_label():

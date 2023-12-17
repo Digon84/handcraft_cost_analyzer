@@ -5,17 +5,18 @@ from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
 from PyQt6 import QtSql as qsql
 
-from src.database.dao.product_dao import ProductDAO
+from src.database.dao.products_dao import ProductsDAO
 
 
 class ProductsListWidget(qtw.QWidget):
+    item_selection_changed = qtc.pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # code here
         self.setMaximumWidth(350)
-
-        self.product_dao = ProductDAO()
+        self.products = []
+        self.product_dao = ProductsDAO()
         self.search_label = self.get_search_label()
         self.search_line_edit = self.get_search_line_edit()
         self.products_list_widget = self.get_product_list_widget()
@@ -36,6 +37,39 @@ class ProductsListWidget(qtw.QWidget):
 
         self.setLayout(product_list_layout)
 
+    def get_product_list_widget(self):
+        tree_widget = qtw.QTreeWidget()
+        self.products, _ = self.product_dao.get_product_names()
+        tree_widget.setHeaderHidden(True)
+
+        for index, self.products in enumerate(self.products):
+            item = qtw.QTreeWidgetItem()
+            item.setText(0, self.products)
+            tree_widget.insertTopLevelItem(index, item)
+
+        tree_widget.currentItemChanged.connect(self.current_item_changed)
+        tree_widget.itemChanged.connect(self.handle_item_changed)
+
+        return tree_widget
+
+    def current_item_changed(self, current: qtw.QTreeWidgetItem, previous: qtw.QTreeWidgetItem):
+        print("load_currently_selected_item_data")
+        print(f"Current item: {current.text(0)}")
+        self.item_selection_changed.emit(current.text(0))
+
+    def handle_item_changed(self, item: qtw.QTreeWidgetItem, column: int):
+        name = item.text(0)
+
+        if not name.endswith(" *"):
+            item.setText(column, name + " *")
+
+    def add_product(self, product_name):
+        item = qtw.QTreeWidgetItem()
+        item.setText(0, product_name + " *")
+        item.setFlags(item.flags() | qtc.Qt.ItemFlag.ItemIsEditable)
+        self.products_list_widget.insertTopLevelItem(self.products_list_widget.topLevelItemCount(), item)
+        self.products_list_widget.setCurrentItem(item)
+
     @staticmethod
     def get_search_label():
         search_label = qtw.QLabel()
@@ -47,24 +81,6 @@ class ProductsListWidget(qtw.QWidget):
         search_line_edit = qtw.QLineEdit()
         search_line_edit.setPlaceholderText("Search...")
         return search_line_edit
-
-    def get_product_list_widget(self):
-        tree_widget = qtw.QTreeWidget()
-        products, _ = self.product_dao.get_product_names()
-        tree_widget.setHeaderHidden(True)
-
-        for index, product in enumerate(products):
-            item = qtw.QTreeWidgetItem()
-            item.setText(0, product)
-            tree_widget.insertTopLevelItem(index, item)
-
-        tree_widget.currentItemChanged.connect(self.load_currently_selected_item_data)
-
-        return tree_widget
-
-    def load_currently_selected_item_data(self, current: qtw.QTreeWidgetItem, previous: qtw.QTreeWidgetItem):
-        print("load_currently_selected_item_data")
-        print(f"Current item: {current.text(0)}")
 
     @staticmethod
     def get_image_path(image_file_name):
