@@ -10,6 +10,7 @@ from src.database.dao.inventory_dao import InventoryDAO
 from src.database.inventory_handler import InventoryHandler
 from src.database.sqlite_connector import SqliteConnector
 from src.widgets.inventory.inventory_widget import InventoryWidget
+from src.widgets.products.add_product_widget import AddProductWidget
 from src.widgets.products.products_widget import ProductsWidget
 from src.widgets.summary.summary_widget import SummaryWidget
 
@@ -34,6 +35,7 @@ class MainWindow(qtw.QMainWindow):
         self.inventory_widget = InventoryWidget()
         self.products_widget = ProductsWidget()
         self.summary_widget = SummaryWidget()
+        self.add_product_widget = AddProductWidget(["Test_product"], ["Test_project_1", "Test_project_2"])
         self.tab_widget = self.get_tab_widget()
         self._create_actions()
         self.tool_bars = self._create_tool_bars()
@@ -67,8 +69,10 @@ class MainWindow(qtw.QMainWindow):
 
     def inventory_tab_changed(self):
         if self.tab_widget.currentIndex() == TabIndexes.Inventory:
+            self.add_item_action.setToolTip("Add new item to inventory")
             self.tool_bars["inventory_tool_bar"].setDisabled(False)
         elif self.tab_widget.currentIndex() == TabIndexes.Products:
+            self.add_item_action.setToolTip("Add new product")
             self.tool_bars["inventory_tool_bar"].setDisabled(True)
         if self.tab_widget.currentIndex() == TabIndexes.Summary:
             self.tool_bars["inventory_tool_bar"].setDisabled(True)
@@ -76,9 +80,15 @@ class MainWindow(qtw.QMainWindow):
             self.summary_widget.set_total_spend(summary)
 
     # projects functions
-    def products_add_product(self):
-        print("Add product")
-        self.products_widget.add_product("New product")
+    def show_add_product_widget(self):
+        self.add_product_widget.adding_product_accepted.connect(self.add_product)
+        self.add_product_widget.setWindowModality(qtc.Qt.WindowModality.ApplicationModal)
+        self.add_product_widget.show()
+
+    def add_product(self, product_name, product_type, use_project_data, project_name):
+        print(f"{product_name}, {product_type}, {use_project_data}, {project_name}")
+
+        self.products_widget.add_product(product_name)
         self.save_action.setDisabled(False)
 
     # common actions triggered
@@ -86,7 +96,7 @@ class MainWindow(qtw.QMainWindow):
         if self.tab_widget.currentIndex() == TabIndexes.Inventory:
             self.inventory_add_item_manually()
         elif self.tab_widget.currentIndex() == TabIndexes.Products:
-            self.products_add_product()
+            self.show_add_product_widget()
 
     def save_action_triggered(self):
         print("save_action_triggered")

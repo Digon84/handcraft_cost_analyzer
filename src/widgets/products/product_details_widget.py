@@ -102,7 +102,6 @@ class ProductDetailsWidget(qtw.QWidget):
             self.picture_placeholders[i].setScaledContents(False)
             self.picture_placeholders[i].setAlignment(qtc.Qt.AlignmentFlag.AlignCenter)
 
-
     @staticmethod
     def get_components_summary_table():
         table_widget = qtw.QTableWidget()
