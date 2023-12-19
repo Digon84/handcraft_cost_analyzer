@@ -6,6 +6,7 @@ from PyQt6 import QtGui as qtg
 
 from src.database.dao.products_dao import ProductsDAO
 from src.entities.product import Product
+from src.widgets.products.component_summary_table_widget import ComponentSummaryTableWidget
 from src.widgets.products.picture_placeholder_widget import PicturePlaceholderWidget
 
 
@@ -91,7 +92,7 @@ class ProductDetailsWidget(qtw.QWidget):
 
     @staticmethod
     def get_components_summary_table():
-        table_widget = qtw.QTableWidget()
+        table_widget = ComponentSummaryTableWidget()
         return table_widget
 
     @staticmethod

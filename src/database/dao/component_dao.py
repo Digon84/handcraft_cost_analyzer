@@ -1,3 +1,5 @@
+from typing import List
+
 from PyQt6.QtSql import QSqlQuery
 
 from src.entities.component import Component
@@ -22,6 +24,30 @@ class ComponentDAO:
             return self.query.result().lastInsertId(), ""
         else:
             return -1, self.query.lastError().text()
+
+    def get_components(self) -> (list[Component], str):
+        """
+        Returns components from components table
+        """
+        self.query.prepare("SELECT * from component")
+
+        result = self.query.exec()
+        if result:
+            components = []
+            while self.query.next():
+                row = {
+                    "material": self.query.value(1),
+                    "type": self.query.value(2),
+                    "made_off": self.query.value(3),
+                    "shape": self.query.value(4),
+                    "color": self.query.value(5),
+                    "finishing_effect": self.query.value(6),
+                    "component_size": self.query.value(7)
+                }
+                components.append(Component(row))
+            return components, ""
+        else:
+            return result, self.query.lastError().text()
 
     def get_component_id(self, component: Component) -> (int, str):
         """

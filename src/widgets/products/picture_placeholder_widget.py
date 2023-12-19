@@ -19,7 +19,6 @@ class PicturePlaceholderWidget(qtw.QLabel):
         self.setLineWidth(1)
         self.setMinimumWidth(250)
         # end of code
-        self.show()
 
     def mousePressEvent(self, event: qtg.QMouseEvent):
         if self.filename == self.get_image_path("plus.png"):
@@ -42,7 +41,9 @@ class PicturePlaceholderWidget(qtw.QLabel):
         image_relative_path = os.path.join("..", "..", "..", "assets", "pictures", image_file_name)
         return os.path.join(absolute_path, image_relative_path)
 
+
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = PicturePlaceholderWidget()
+    w.show()
     sys.exit(app.exec())

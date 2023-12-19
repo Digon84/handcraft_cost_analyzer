@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class ComponentsUsed:
     project_id: int
+    product_id: int
     component_id: int
     amount: int
     unit_price: float
