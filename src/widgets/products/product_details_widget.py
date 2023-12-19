@@ -6,6 +6,7 @@ from PyQt6 import QtGui as qtg
 
 from src.database.dao.products_dao import ProductsDAO
 from src.entities.product import Product
+from src.widgets.products.picture_placeholder_widget import PicturePlaceholderWidget
 
 
 class ProductDetailsWidget(qtw.QWidget):
@@ -39,15 +40,7 @@ class ProductDetailsWidget(qtw.QWidget):
     def get_picture_placeholders():
         picture_placeholders = []
         for i in range(3):
-            picture_placeholder = qtw.QLabel()
-            picture_placeholder.setPixmap(qtg.QPixmap(ProductDetailsWidget.get_image_path("plus.png")))
-            picture_placeholder.setAlignment(qtc.Qt.AlignmentFlag.AlignCenter)
-
-            picture_placeholder.setFrameShape(qtw.QFrame.Shape.Box)
-            picture_placeholder.setFrameShadow(qtw.QFrame.Shadow.Plain)
-            picture_placeholder.setLineWidth(1)
-            picture_placeholder.setMinimumWidth(250)
-            picture_placeholders.append(picture_placeholder)
+            picture_placeholders.append(PicturePlaceholderWidget())
         return picture_placeholders
 
     def set_layouts(self):
@@ -81,17 +74,11 @@ class ProductDetailsWidget(qtw.QWidget):
 
     def load_pictures(self, product):
         if product.picture_1:
-            self.picture_placeholders[0].setPixmap(qtg.QPixmap(product.picture_1))
-            self.picture_placeholders[0].setScaledContents(True)
-            self.picture_placeholders[0].setSizePolicy(qtw.QSizePolicy.Policy.Ignored, qtw.QSizePolicy.Policy.Ignored)
+            self.picture_placeholders[0].set_image(product.picture_1)
         if product.picture_2:
-            self.picture_placeholders[1].setPixmap(qtg.QPixmap(product.picture_2))
-            self.picture_placeholders[1].setScaledContents(True)
-            self.picture_placeholders[1].setSizePolicy(qtw.QSizePolicy.Policy.Ignored, qtw.QSizePolicy.Policy.Ignored)
+            self.picture_placeholders[1].set_image(product.picture_2)
         if product.picture_3:
-            self.picture_placeholders[2].setPixmap(qtg.QPixmap(product.picture_3))
-            self.picture_placeholders[2].setScaledContents(True)
-            self.picture_placeholders[2].setSizePolicy(qtw.QSizePolicy.Policy.Ignored, qtw.QSizePolicy.Policy.Ignored)
+            self.picture_placeholders[2].set_image(product.picture_3)
 
     def load_components_summary_table(self):
         pass
