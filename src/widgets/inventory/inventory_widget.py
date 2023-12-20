@@ -27,6 +27,7 @@ class InventoryWidget(qtw.QWidget):
     def __init__(self):
         super().__init__()
         self.table_view = qtw.QTableView()
+        self.table_view.horizontalHeader().setSectionResizeMode(qtw.QHeaderView.ResizeMode.Stretch)
         self.source_table_model, self.filter_proxy_model = self.set_table_models()
         self.columns_mapping = self.get_columns_mapping()
         self.hide_columns()
@@ -211,6 +212,39 @@ class InventoryWidget(qtw.QWidget):
                     row[column_name] = data
             data_to_export.append(row)
         return data_to_export
+
+    def get_selected_indexes(self):
+        return self.table_view.selectedIndexes()
+
+    def get_selected_inventory_items(self) -> list[Inventory]:
+        inventory_items = []
+
+        indexes = self.table_view.selectedIndexes()
+        for index in indexes:
+            row = {}
+            row_index = index.row()
+            for column_index in range(self.source_table_model.columnCount()):
+                column_name = self.source_table_model.headerData(column_index, qtc.Qt.Orientation.Horizontal)
+                data = self.source_table_model.data(self.source_table_model.index(row_index, column_index))
+                if column_name != "inventory_id":
+                    row[column_name] = data
+            inventory_items.append(Inventory(row))
+        return inventory_items
+
+    def group_by_component_id(self):
+        self.query = """SELECT inventory.inventory_id, component.component_id, component.material, component.type,
+                        component.made_off, component.shape, component.color, component.finishing_effect,
+                        component.component_size, sum(inventory.amount) as amount,
+                        avg(inventory.unit_price) as unit_price, avg(inventory.total_price) as total_price,
+                        inventory.other, inventory.add_date
+                        FROM inventory
+                        INNER JOIN component ON inventory.component_id == component.component_id
+                        GROUP BY inventory.component_id"""
+        self.source_table_model.setQuery(self.query)
+        self.source_table_model.dataChanged.emit(self.source_table_model.index(0, 0),
+                                                 self.source_table_model.index(self.source_table_model.rowCount(),
+                                                                               self.source_table_model.columnCount()),
+                                                 [])
 
     def _set_up_completer(self):
         completer_proxy_model = UniqueItemsProxyModel(self)

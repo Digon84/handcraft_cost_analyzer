@@ -14,7 +14,7 @@ class Inventory:
     add_date: str = ""
     component_id: int = -1
 
-    def __init__(self, row: dict, component_id: int = -1, component: Component = None):
+    def __init__(self, row: dict, component: Component = None):
         self.amount = row["amount"]
         self.other = row["other"]
         self.unit_price = row["unit_price"]
@@ -24,4 +24,4 @@ class Inventory:
             self.component = Component(row)
         self.total_price = row["total_price"]
         self.add_date = row["add_date"]
-        self.component_id = component_id
+        self.component_id = row["component_id"] if "component_id" in row else -1

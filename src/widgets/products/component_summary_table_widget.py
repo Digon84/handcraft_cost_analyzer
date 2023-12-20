@@ -4,6 +4,8 @@ from PyQt6 import QtCore as qtc
 from PyQt6 import QtGui as qtg
 
 from src.database.dao.component_dao import ComponentDAO
+from src.entities.inventory import Inventory
+from src.widgets.products.add_component_widget import AddComponentWidget
 
 
 class ComponentSummaryTableWidget(qtw.QTableWidget):
@@ -17,10 +19,10 @@ class ComponentSummaryTableWidget(qtw.QTableWidget):
         # end of code
 
     def set_table(self):
-        # component = material + type + color
-        self.setColumnCount(4)
+        self.setColumnCount(5)
         self.horizontalHeader().setSectionResizeMode(qtw.QHeaderView.ResizeMode.Stretch)
-        self.setHorizontalHeaderLabels(["component", "amount", "unit_price", "total_price"])
+        self.setHorizontalHeaderLabels(["component", "amount", "unit_price", "total_price", "component_id"])
+        # self.hideColumn(4)
 
     def create_context_menu(self):
         context_menu = qtw.QMenu(self)
@@ -44,8 +46,23 @@ class ComponentSummaryTableWidget(qtw.QTableWidget):
         print("contextMenuEvent")
         self.context_menu.popup(qtg.QCursor.pos())
 
+    def store_components_in_table(self, inventory_list: list[Inventory], amount: str):
+        for inventory in inventory_list:
+            self.insertRow(self.rowCount())
+            next_item = self.rowCount() - 1
+            component_short_name = " ".join([inventory.component.material,
+                                             inventory.component.type,
+                                             inventory.component.color])
+            self.setItem(next_item, 0, qtw.QTableWidgetItem(component_short_name))
+            self.setItem(next_item, 1, qtw.QTableWidgetItem(str(amount)))
+            self.setItem(next_item, 2, qtw.QTableWidgetItem(str(round(inventory.unit_price, 3))))
+            self.setItem(next_item, 3, qtw.QTableWidgetItem(str(round(inventory.unit_price * int(amount), 3))))
+            self.setItem(next_item, 4, qtw.QTableWidgetItem(str(inventory.component_id)))
+
     def add_action_triggered(self):
-        print("add_action_triggered")
+        self.add_component_widget = AddComponentWidget()
+        self.add_component_widget.components_selected.connect(self.store_components_in_table)
+        self.add_component_widget.show()
 
     def delete_action_triggered(self):
         print("delete_action_triggered")

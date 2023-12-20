@@ -143,7 +143,6 @@ class AddProductWidget(qtw.QDialog):
         return line_edit
 
 
-
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
     w = AddProductWidget(["test_product"], ["test_project_1", "test_project_2"])
