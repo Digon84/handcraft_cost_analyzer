@@ -219,10 +219,9 @@ class InventoryWidget(qtw.QWidget):
     def get_selected_inventory_items(self) -> list[Inventory]:
         inventory_items = []
 
-        indexes = self.table_view.selectedIndexes()
-        for index in indexes:
+        row_indexes = set([index.row() for index in self.table_view.selectedIndexes()])
+        for row_index in row_indexes:
             row = {}
-            row_index = index.row()
             for column_index in range(self.source_table_model.columnCount()):
                 column_name = self.source_table_model.headerData(column_index, qtc.Qt.Orientation.Horizontal)
                 data = self.source_table_model.data(self.source_table_model.index(row_index, column_index))

@@ -13,6 +13,7 @@ class ComponentSummaryTableWidget(qtw.QTableWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # code here
+        self.initiated = False
         self.component_dao = ComponentDAO()
         self.context_menu = self.create_context_menu()
         self.set_table()
@@ -22,6 +23,7 @@ class ComponentSummaryTableWidget(qtw.QTableWidget):
         self.setColumnCount(5)
         self.horizontalHeader().setSectionResizeMode(qtw.QHeaderView.ResizeMode.Stretch)
         self.setHorizontalHeaderLabels(["component", "amount", "unit_price", "total_price", "component_id"])
+        self.cellChanged.connect(self.cell_changed_triggered)
         # self.hideColumn(4)
 
     def create_context_menu(self):
@@ -53,11 +55,30 @@ class ComponentSummaryTableWidget(qtw.QTableWidget):
             component_short_name = " ".join([inventory.component.material,
                                              inventory.component.type,
                                              inventory.component.color])
-            self.setItem(next_item, 0, qtw.QTableWidgetItem(component_short_name))
+
+            # component
+            item = qtw.QTableWidgetItem(component_short_name)
+            item.setFlags(item.flags() ^ qtc.Qt.ItemFlag.ItemIsEditable)
+            self.setItem(next_item, 0, item)
+
+            # amount
             self.setItem(next_item, 1, qtw.QTableWidgetItem(str(amount)))
-            self.setItem(next_item, 2, qtw.QTableWidgetItem(str(round(inventory.unit_price, 3))))
-            self.setItem(next_item, 3, qtw.QTableWidgetItem(str(round(inventory.unit_price * int(amount), 3))))
-            self.setItem(next_item, 4, qtw.QTableWidgetItem(str(inventory.component_id)))
+
+            # unit_price
+            item = qtw.QTableWidgetItem(str(round(inventory.unit_price, 3)))
+            item.setFlags(item.flags() ^ qtc.Qt.ItemFlag.ItemIsEditable)
+            self.setItem(next_item, 2, item)
+
+            # total_price
+            item = qtw.QTableWidgetItem(str(round(inventory.unit_price * int(amount), 3)))
+            item.setFlags(item.flags() ^ qtc.Qt.ItemFlag.ItemIsEditable)
+            self.setItem(next_item, 3, item)
+
+            # component_id
+            item = qtw.QTableWidgetItem(str(inventory.component_id))
+            item.setFlags(item.flags() ^ qtc.Qt.ItemFlag.ItemIsEditable)
+            self.setItem(next_item, 4, item)
+        self.initiated = True
 
     def add_action_triggered(self):
         self.add_component_widget = AddComponentWidget()
@@ -65,7 +86,24 @@ class ComponentSummaryTableWidget(qtw.QTableWidget):
         self.add_component_widget.show()
 
     def delete_action_triggered(self):
-        print("delete_action_triggered")
+        row_indexes = list(set([index.row() for index in self.selectedIndexes()]))
+        row_indexes.sort(reverse=True)
+        for row_index in row_indexes:
+            self.removeRow(row_index)
+
+    def cell_changed_triggered(self, row: int, column: int):
+        if self.initiated:
+            # amount
+            if column == 1:
+                amount = float(self.item(row, column).text())
+                unit_price = float(self.item(row, 2).text())
+                self.item(row, 3).setText(str(round(amount * unit_price, 3)))
+
+
+    def keyPressEvent(self, event):
+        if event.key() == qtc.Qt.Key.Key_Delete:
+            self.delete_action_triggered()
+
 
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
